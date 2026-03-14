@@ -1,0 +1,22 @@
+.group {
+  height: 100%;
+  width: 100%;
+}
+
+.panel {
+  height: 100%;
+  overflow: hidden;
+}
+
+.handle {
+  width: 5px;
+  background: var(--color-border);
+  cursor: col-resize;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+
+.handle:hover,
+.handle[data-resize-handle-active] {
+  background: var(--color-accent);
+}

@@ -150,6 +150,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Core development**: Implement models, services, CLI commands, endpoints
    - **Integration work**: Database connections, middleware, logging, external services
    - **Polish and validation**: Unit tests, performance optimization, documentation
+   - **ALWAYS apply the development skill**: Every JavaScript/JSX file created or edited **must** strictly follow the standards defined in `.github/skills/devolopment/SKILL.MD` — naming conventions, function design, variable declaration, conditionals, and all other guidelines defined there.
 
 8. Progress tracking and error handling:
    - Report progress after each completed task

@@ -4,7 +4,7 @@ import styles from './MarkdownEditor.module.css'
  * Plain <textarea> Markdown editor.
  * Tab key inserts two spaces instead of moving focus.
  */
-export default function MarkdownEditor({ value, onChange, placeholder }) {
+export default function MarkdownEditor({ value, onChange, placeholder, textareaRef, onScroll }) {
   function handleKeyDown(e) {
     if (e.key === 'Tab') {
       e.preventDefault()
@@ -21,10 +21,12 @@ export default function MarkdownEditor({ value, onChange, placeholder }) {
 
   return (
     <textarea
+      ref={textareaRef}
       className={styles.editor}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       onKeyDown={handleKeyDown}
+      onScroll={onScroll}
       spellCheck={false}
       aria-label="Markdown editor"
       placeholder={placeholder ?? 'Start typing Markdown…'}

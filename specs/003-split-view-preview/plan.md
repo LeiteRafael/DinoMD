@@ -5,7 +5,9 @@
 
 ## Summary
 
-Split-view mode renders two side-by-side panes inside the existing Electron + React app: a plain-text editor (left) and a live Markdown preview (right). The preview reuses the existing `MarkdownViewer` component and re-renders with a 300 ms debounce on every keystroke. Panes are separated by a draggable resizer provided by `react-resizable-panels`. Synchronized scrolling is implemented via `onScroll` handlers that translate proportional scroll position. View mode (split / editor-only / preview-only) is transient renderer state — no IPC or persistence needed. This feature layered on top of spec 002 (Create & Edit Markdown Files) which provides the editor component, save/discard flow, and IPC channels for reading and writing document content.
+Split-view mode renders two side-by-side panes inside the existing Electron + React app: a plain-text editor (left) and a live Markdown preview (right). The preview reuses the existing `MarkdownViewer` component and re-renders with a 300 ms debounce on every keystroke. Panes are separated by a draggable resizer provided by `react-resizable-panels`. Synchronized scrolling is implemented via `onScroll` handlers that translate proportional scroll position. View mode (split / editor-only / preview-only) is transient renderer state — no IPC or persistence needed. This feature is layered on top of spec 002 (Create & Edit Markdown Files) which provides `MarkdownEditor`, the `useEditor` save/discard hook, and IPC channels for reading and writing document content.
+
+> **EditorPane clarification**: `EditorPane` is a new component created in spec 003 Phase 1 (T002a). It is a thin controlled wrapper around spec 002's `MarkdownEditor`, exposing a `value` / `onChange` / `onSave` / `onDiscard` interface suitable for use inside `SplitViewPage`. It does not exist in spec 002.
 
 ## Technical Context
 

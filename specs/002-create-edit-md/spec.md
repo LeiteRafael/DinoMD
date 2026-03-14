@@ -17,11 +17,11 @@ A user wants to start a brand-new `.md` file from within DinoMD. They trigger th
 
 **Acceptance Scenarios**:
 
-1. **Given** the main page is open, **When** the user triggers the "New document" action, **Then** a prompt or inline input appears requesting a document name.
-2. **Given** the user enters a valid name and confirms, **When** the editor opens, **Then** the editor is empty and ready to receive input.
-3. **Given** the user types content in the editor and triggers Save, **When** the save operation completes, **Then** the file is persisted on disk with the given name and the document card appears on the main page.
-4. **Given** the user enters a document name that already exists, **When** they confirm the name, **Then** the application warns about the conflict and asks for confirmation or a different name before overwriting.
-5. **Given** the user opens the new document prompt and cancels without entering a name, **When** the cancellation is confirmed, **Then** no file is created and the main page remains unchanged.
+1. **Given** the main page is open, **When** the user triggers the "New document" action, **Then** an empty editor opens immediately with a placeholder title ("Untitled"), ready to receive input.
+2. **Given** the editor is open with an untitled document, **When** the user triggers Save for the first time, **Then** the application opens a native Save dialog so the user can choose a file name and location before writing to disk.
+3. **Given** the user types content in the editor and confirms a file name via the Save dialog, **When** the save operation completes, **Then** the file is persisted on disk with the chosen name and the document card appears on the main page.
+4. **Given** the user has chosen a file name via the Save dialog that already exists on disk, **When** the OS dialog confirms the overwrite or a conflict is detected, **Then** the application warns about the conflict and asks for confirmation or a different name before overwriting.
+5. **Given** the user triggers the Save dialog and cancels it without choosing a path, **When** the cancellation is confirmed, **Then** no file is created on disk and the editor remains open with its in-memory content intact.
 
 ---
 
@@ -45,16 +45,16 @@ A user selects an existing document from the main page and switches from read-on
 
 ### User Story 3 - Delete a Document (Priority: P3)
 
-A user decides to remove a document they no longer need. They trigger the delete action on a document card or from within the document view. After a confirmation step, the file is removed from disk and the card disappears from the main page.
+A user decides to remove a document they no longer need. They trigger the delete action on a document card or from within the document view. After a confirmation step, the file is moved to the OS trash and the card disappears from the main page.
 
 **Why this priority**: Deletion completes the document lifecycle. It is lower priority than create and edit because users can still manage documents externally, but it significantly improves app self-sufficiency.
 
-**Independent Test**: Can be fully tested by importing a document, deleting it via the app, and verifying the card is gone from the main page and the file no longer exists on disk.
+**Independent Test**: Can be fully tested by importing a document, deleting it via the app, and verifying the card is gone from the main page and the file has been moved to the OS trash (recoverable).
 
 **Acceptance Scenarios**:
 
 1. **Given** a document card is visible on the main page, **When** the user triggers the delete action, **Then** a confirmation dialog appears before any deletion occurs.
-2. **Given** the confirmation dialog is shown, **When** the user confirms the deletion, **Then** the file is removed from disk and the card disappears from the main page.
+2. **Given** the confirmation dialog is shown, **When** the user confirms the deletion, **Then** the file is moved to the OS trash and the card disappears from the main page.
 3. **Given** the confirmation dialog is shown, **When** the user cancels, **Then** no file is deleted and the main page remains unchanged.
 4. **Given** the file has already been deleted externally (not found on disk), **When** the user attempts to open or delete it in the app, **Then** the application shows a clear message and removes the stale card from the list.
 
@@ -72,7 +72,7 @@ A user decides to remove a document they no longer need. They trigger the delete
 
 ### Functional Requirements
 
-- **FR-001**: Users MUST be able to create a new blank `.md` document from the main page, providing a name before the editor opens.
+- **FR-001**: Users MUST be able to create a new blank `.md` document from the main page. The editor opens immediately with an untitled in-memory buffer; the user is prompted for a file name and location via a native Save dialog only on the first explicit Save.
 - **FR-002**: Users MUST be able to open any existing document in an editable mode from either the main page or the read view.
 - **FR-003**: The editor MUST support free-form Markdown text entry, including line breaks, indentation, and all standard Markdown syntax characters.
 - **FR-004**: Users MUST be able to save changes explicitly (via a Save action), writing the current editor content to the corresponding file on disk.

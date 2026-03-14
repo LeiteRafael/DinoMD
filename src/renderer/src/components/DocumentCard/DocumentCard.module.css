@@ -65,3 +65,39 @@
   background: var(--color-missing);
   color: var(--color-surface);
 }
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.card:hover .cardActions {
+  opacity: 1;
+}
+
+.editBtn,
+.deleteBtn {
+  background: transparent;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.2rem 0.45rem;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.editBtn:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.deleteBtn:hover {
+  background: #e53e3e;
+  color: #fff;
+}

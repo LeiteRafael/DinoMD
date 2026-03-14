@@ -1,12 +1,34 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, shell } from 'electron'
 import { v4 as uuidv4 } from 'uuid'
 import {
   getDocuments,
   setDocuments,
   findDocumentById,
-  findDocumentByPath
+  findDocumentByPath,
+  updateDocument,
+  removeDocumentById
 } from '../store/index.js'
-import { fileExists, readFileAsUtf8 } from '../fs/fileUtils.js'
+import {
+  fileExists,
+  readFileAsUtf8,
+  writeFileUtf8,
+  renameFile,
+  watchFile,
+  stopWatching
+} from '../fs/fileUtils.js'
+import { promises as fs } from 'fs'
+import { basename, dirname, join } from 'path'
+
+// The main BrowserWindow reference — set via setMainWindow() after creation
+let _mainWindow = null
+
+/**
+ * Call this after BrowserWindow creation so the IPC handlers can push events
+ * (e.g. file:changed-externally) back to the renderer.
+ */
+export function setMainWindow(win) {
+  _mainWindow = win
+}
 
 export function registerDocumentHandlers() {
   ipcMain.handle('documents:import-files', handleImportFiles)
@@ -14,6 +36,10 @@ export function registerDocumentHandlers() {
   ipcMain.handle('documents:remove', handleRemove)
   ipcMain.handle('documents:reorder', handleReorder)
   ipcMain.handle('documents:read-content', handleReadContent)
+  ipcMain.handle('documents:create', handleCreate)
+  ipcMain.handle('documents:save', handleSave)
+  ipcMain.handle('documents:rename', handleRename)
+  ipcMain.handle('documents:delete', handleDelete)
 }
 
 // ── documents:import-files ──────────────────────────────────────────────────
@@ -152,8 +178,142 @@ async function handleReadContent(_event, { id }) {
     if (!doc) return { success: false, content: null, error: 'Document not found' }
 
     const content = await readFileAsUtf8(doc.filePath)
+
+    // Start watching for external changes — notify renderer when file is touched
+    watchFile(doc.filePath, async (changedPath) => {
+      try {
+        const stat = await fs.stat(changedPath)
+        if (_mainWindow && !_mainWindow.isDestroyed()) {
+          _mainWindow.webContents.send('file:changed-externally', {
+            id: doc.id,
+            filePath: changedPath,
+            mtimeMs: stat.mtimeMs
+          })
+        }
+      } catch {
+        // File may have been deleted — ignore
+      }
+    })
+
     return { success: true, content, error: null }
   } catch (err) {
     return { success: false, content: null, error: err.message }
+  }
+}
+
+// ── documents:create ────────────────────────────────────────────────────────
+async function handleCreate() {
+  try {
+    const id = uuidv4()
+    return {
+      success: true,
+      draft: { id, name: 'Untitled', filePath: null, isDraft: true },
+      error: null
+    }
+  } catch (err) {
+    return { success: false, draft: null, error: err.message }
+  }
+}
+
+// ── documents:save ──────────────────────────────────────────────────────────
+async function handleSave(_event, { id, filePath, name, content }) {
+  try {
+    if (!id) return { success: false, canceled: false, filePath: null, name: null, mtimeMs: null, error: 'Missing id' }
+
+    // New draft — open Save dialog
+    if (!filePath) {
+      const { canceled, filePath: chosenPath } = await dialog.showSaveDialog({
+        defaultPath: `${name || 'Untitled'}.md`,
+        filters: [{ name: 'Markdown', extensions: ['md'] }]
+      })
+      if (canceled || !chosenPath) {
+        return { success: true, canceled: true, filePath: null, name: null, mtimeMs: null, error: null }
+      }
+
+      await writeFileUtf8(chosenPath, content)
+      const stat = await fs.stat(chosenPath)
+      const resolvedName = basename(chosenPath).replace(/\.md$/i, '')
+      const docs = getDocuments()
+      const newDoc = {
+        id,
+        name: resolvedName,
+        filePath: chosenPath,
+        orderIndex: docs.length,
+        importedAt: new Date().toISOString(),
+        mtimeMs: stat.mtimeMs
+      }
+      setDocuments([...docs, newDoc])
+      return { success: true, canceled: false, filePath: chosenPath, name: resolvedName, mtimeMs: stat.mtimeMs, error: null }
+    }
+
+    // Existing document — write and update mtimeMs
+    await writeFileUtf8(filePath, content)
+    const stat = await fs.stat(filePath)
+    updateDocument(id, { mtimeMs: stat.mtimeMs })
+    return { success: true, canceled: false, filePath, name: null, mtimeMs: stat.mtimeMs, error: null }
+  } catch (err) {
+    return { success: false, canceled: false, filePath: null, name: null, mtimeMs: null, error: err.message }
+  }
+}
+
+// ── documents:rename ────────────────────────────────────────────────────────
+async function handleRename(_event, { id, newName }) {
+  try {
+    if (!id) return { success: false, newFilePath: null, error: 'Missing id' }
+    if (!newName || newName.trim() === '') return { success: false, newFilePath: null, error: 'Invalid document name' }
+    if (/[/\\]/.test(newName)) return { success: false, newFilePath: null, error: 'Invalid document name' }
+
+    const doc = findDocumentById(id)
+    if (!doc) return { success: false, newFilePath: null, error: 'Document not found' }
+
+    const dir = dirname(doc.filePath)
+    const newFilePath = join(dir, `${newName.trim()}.md`)
+
+    // Pre-flight: check if target name already exists
+    if (await fileExists(newFilePath)) {
+      return { success: false, newFilePath: null, error: 'A document with that name already exists.' }
+    }
+
+    await renameFile(doc.filePath, newFilePath)
+    updateDocument(id, { name: newName.trim(), filePath: newFilePath })
+    return { success: true, newFilePath, error: null }
+  } catch (err) {
+    return { success: false, newFilePath: null, error: err.message }
+  }
+}
+
+// ── documents:delete ────────────────────────────────────────────────────────
+async function handleDelete(_event, { id, force = false }) {
+  try {
+    if (!id) return { success: false, canForceDelete: false, error: 'Missing id' }
+
+    const doc = findDocumentById(id)
+    if (!doc) return { success: false, canForceDelete: false, error: 'Document not found' }
+
+    // Stale entry — file no longer on disk
+    const exists = await fileExists(doc.filePath)
+    if (!exists) {
+      stopWatching()
+      removeDocumentById(id)
+      return { success: true, canForceDelete: false, error: null }
+    }
+
+    if (force) {
+      await fs.unlink(doc.filePath)
+      stopWatching()
+      removeDocumentById(id)
+      return { success: true, canForceDelete: false, error: null }
+    }
+
+    try {
+      await shell.trashItem(doc.filePath)
+      stopWatching()
+      removeDocumentById(id)
+      return { success: true, canForceDelete: false, error: null }
+    } catch (trashErr) {
+      return { success: false, canForceDelete: true, error: trashErr.message }
+    }
+  } catch (err) {
+    return { success: false, canForceDelete: false, error: err.message }
   }
 }

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
-import { registerDocumentHandlers } from './ipc/documents.js'
+import { registerDocumentHandlers, setMainWindow } from './ipc/documents.js'
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -16,6 +16,9 @@ function createWindow() {
   })
 
   win.on('ready-to-show', () => win.show())
+
+  // Make mainWindow available to push events to renderer
+  setMainWindow(win)
 
   // Open external links in the OS browser, not in Electron
   win.webContents.setWindowOpenHandler(({ url }) => {

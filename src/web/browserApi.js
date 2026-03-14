@@ -159,11 +159,82 @@ async function reorder({ orderedIds }) {
   return { success: true }
 }
 
+// ── Feature-002: create / save / rename / delete ──────────────────────────────
+
+async function create() {
+  const id = genId()
+  return { success: true, draft: { id, name: 'Untitled', filePath: null, isDraft: true }, error: null }
+}
+
+async function save({ id, filePath, name, content }) {
+  const mtimeMs = Date.now()
+  try {
+    if (!filePath) {
+      // New draft — persist as a brand-new document entry
+      const docs = loadDocs()
+      const resolvedName = (name || 'Untitled').replace(/\.md$/i, '')
+      const resolvedPath = `${resolvedName}.md`
+      const newDoc = {
+        id,
+        name: resolvedName,
+        filePath: resolvedPath,
+        orderIndex: docs.length,
+        importedAt: new Date().toISOString(),
+        mtimeMs
+      }
+      localStorage.setItem(contentKey(id), content ?? '')
+      saveDocs([...docs, newDoc])
+      return { success: true, canceled: false, filePath: resolvedPath, name: resolvedName, mtimeMs, error: null }
+    }
+    // Existing document — update content and mtime
+    const docs = loadDocs()
+    const updated = docs.map((d) => (d.id === id ? { ...d, mtimeMs } : d))
+    localStorage.setItem(contentKey(id), content ?? '')
+    saveDocs(updated)
+    return { success: true, canceled: false, filePath, name: null, mtimeMs, error: null }
+  } catch (err) {
+    return { success: false, canceled: false, filePath: null, name: null, mtimeMs: null, error: err.message }
+  }
+}
+
+async function renameDoc({ id, newName }) {
+  try {
+    const trimmed = (newName ?? '').trim()
+    if (!trimmed) return { success: false, newFilePath: null, error: 'Invalid document name' }
+    const docs = loadDocs()
+    const newFilePath = `${trimmed}.md`
+    const updated = docs.map((d) => (d.id === id ? { ...d, name: trimmed, filePath: newFilePath } : d))
+    saveDocs(updated)
+    return { success: true, newFilePath, error: null }
+  } catch (err) {
+    return { success: false, newFilePath: null, error: err.message }
+  }
+}
+
+async function deleteDoc({ id }) {
+  try {
+    const docs = loadDocs()
+      .filter((d) => d.id !== id)
+      .map((d, i) => ({ ...d, orderIndex: i }))
+    saveDocs(docs)
+    localStorage.removeItem(contentKey(id))
+    return { success: true, canForceDelete: false, error: null }
+  } catch (err) {
+    return { success: false, canForceDelete: false, error: err.message }
+  }
+}
+
 // ── Export as the same shape consumed by services/api.js ─────────────────────
 export const api = {
   importFiles,
   getAll,
   readContent,
   remove,
-  reorder
+  reorder,
+  create,
+  save,
+  rename: renameDoc,
+  delete: deleteDoc,
+  onFileChangedExternally: () => undefined,
+  removeFileChangedListener: () => undefined
 }

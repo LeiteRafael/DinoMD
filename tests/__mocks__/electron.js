@@ -8,7 +8,13 @@ const ipcMain = {
 }
 
 const dialog = {
-  showOpenDialog: jest.fn()
+  showOpenDialog: jest.fn(),
+  showSaveDialog: jest.fn()
+}
+
+const shell = {
+  trashItem: jest.fn(() => Promise.resolve()),
+  openExternal: jest.fn()
 }
 
 const app = {
@@ -32,4 +38,4 @@ function resetMocks() {
   jest.clearAllMocks()
 }
 
-module.exports = { ipcMain, dialog, app, invokeHandler, resetMocks }
+module.exports = { ipcMain, dialog, shell, app, invokeHandler, resetMocks }

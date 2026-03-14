@@ -17,7 +17,7 @@ import { CSS } from '@dnd-kit/utilities'
 import DocumentCard from '../DocumentCard/index.jsx'
 import styles from './DocumentList.module.css'
 
-function SortableCard({ doc, onOpen }) {
+function SortableCard({ doc, onOpen, onEdit, onDelete }) {
   const {
     attributes,
     listeners,
@@ -42,13 +42,15 @@ function SortableCard({ doc, onOpen }) {
         name={doc.name}
         status={doc.status}
         onClick={onOpen}
+        onEdit={onEdit}
+        onDelete={onDelete}
         dragHandleProps={{ ...attributes, ...listeners }}
       />
     </div>
   )
 }
 
-export default function DocumentList({ documents, onOpen, onReorder }) {
+export default function DocumentList({ documents, onOpen, onEdit, onDelete, onReorder }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -78,7 +80,7 @@ export default function DocumentList({ documents, onOpen, onReorder }) {
       >
         <div className={styles.list}>
           {documents.map((doc) => (
-            <SortableCard key={doc.id} doc={doc} onOpen={onOpen} />
+            <SortableCard key={doc.id} doc={doc} onOpen={onOpen} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </div>
       </SortableContext>

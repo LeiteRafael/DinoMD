@@ -7,12 +7,18 @@ jest.mock('../../src/main/store/index.js', () => ({
   getDocuments: jest.fn(() => []),
   setDocuments: jest.fn(),
   findDocumentById: jest.fn(() => null),
-  findDocumentByPath: jest.fn(() => null)
+  findDocumentByPath: jest.fn(() => null),
+  updateDocument: jest.fn(),
+  removeDocumentById: jest.fn()
 }))
 
 jest.mock('../../src/main/fs/fileUtils.js', () => ({
   fileExists: jest.fn(() => Promise.resolve(true)),
-  readFileAsUtf8: jest.fn(() => Promise.resolve('# Hello'))
+  readFileAsUtf8: jest.fn(() => Promise.resolve('# Hello')),
+  writeFileUtf8: jest.fn(() => Promise.resolve()),
+  renameFile: jest.fn(() => Promise.resolve()),
+  watchFile: jest.fn(),
+  stopWatching: jest.fn()
 }))
 
 const store = require('../../src/main/store/index.js')

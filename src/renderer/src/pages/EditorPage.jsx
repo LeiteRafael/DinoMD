@@ -19,6 +19,7 @@ export default function EditorPage({
   onBack,
   onDocumentSaved,
   onDocumentDeleted,
+  onDocumentRenamed,
   onSplitView
 }) {
   const {
@@ -130,6 +131,8 @@ export default function EditorPage({
       setTitleValue(session.name) // revert
       // Clear error after 4 s
       setTimeout(() => setTitleError(null), 4000)
+    } else {
+      onDocumentRenamed?.()
     }
   }
 

@@ -3,7 +3,7 @@ import MarkdownViewer from '../components/MarkdownViewer/index.jsx'
 import ErrorBoundary from '../components/ErrorBoundary/index.jsx'
 import styles from './ReaderPage.module.css'
 
-export default function ReaderPage({ documentId, documentName, onBack }) {
+export default function ReaderPage({ documentId, documentName, onBack, onEditDocument }) {
   const { rawMarkdown, loading, error } = useMarkdown(documentId)
 
   return (
@@ -13,6 +13,15 @@ export default function ReaderPage({ documentId, documentName, onBack }) {
           ← Back
         </button>
         <span className={styles.title}>{documentName}</span>
+        {onEditDocument && (
+          <button
+            className={styles.editBtn}
+            onClick={() => onEditDocument({ id: documentId, name: documentName })}
+            aria-label="Edit document"
+          >
+            Edit
+          </button>
+        )}
       </header>
 
       <main className={styles.main}>

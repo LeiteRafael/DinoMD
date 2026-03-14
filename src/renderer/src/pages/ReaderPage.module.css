@@ -32,12 +32,29 @@
 }
 
 .title {
+  flex: 1;
   font-size: 0.95rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--color-text-muted);
+}
+
+.editBtn {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.editBtn:hover {
+  background: var(--color-accent-hover);
 }
 
 .main {

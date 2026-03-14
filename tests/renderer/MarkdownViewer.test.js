@@ -26,14 +26,14 @@ jest.mock('react-markdown', () => {
         if (!inCode) {
           flushList()
           inCode = true
-          codeLang = line.slice(3).trim() || 'text'
+          codeLang = line.slice(3).trim()
           codeLines = []
         } else {
           const codeStr = codeLines.join('\n')
           const CodeComponent = components?.code
           if (CodeComponent) {
             elements.push(
-              <CodeComponent key={`code-${i}`} className={`language-${codeLang}`}>
+              <CodeComponent key={`code-${i}`} className={codeLang ? `language-${codeLang}` : undefined}>
                 {codeStr}
               </CodeComponent>
             )
@@ -130,5 +130,30 @@ describe('MarkdownViewer', () => {
   test('returns null when rawMarkdown is null', () => {
     const { container } = render(<MarkdownViewer rawMarkdown={null} />)
     expect(container.firstChild).toBeNull()
+  })
+
+  test('renders fallback pre element when codeToHtml rejects', async () => {
+    codeToHtml.mockRejectedValueOnce(new Error('Language not supported'))
+
+    const mdWithCode = '```unknown\nsome code\n```'
+    let container
+    await act(async () => {
+      const result = render(<MarkdownViewer rawMarkdown={mdWithCode} />)
+      container = result.container
+    })
+
+    // After rejection, CodeBlock renders a div with data-language via dangerouslySetInnerHTML
+    expect(container.querySelector('[data-language="unknown"]')).toBeInTheDocument()
+  })
+
+  test('uses "text" as fallback language when code block has no language specifier', async () => {
+    const mdWithNoLang = '```\nsome code\n```'
+    await act(async () => {
+      render(<MarkdownViewer rawMarkdown={mdWithNoLang} />)
+    })
+    expect(codeToHtml).toHaveBeenCalledWith(
+      'some code',
+      expect.objectContaining({ lang: 'text' })
+    )
   })
 })

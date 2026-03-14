@@ -81,4 +81,24 @@ describe('DocumentList', () => {
 
     expect(onReorder).not.toHaveBeenCalled()
   })
+
+  test('applies reduced opacity and higher zIndex while an item is being dragged', () => {
+    const { useSortable } = require('@dnd-kit/sortable')
+    useSortable.mockReturnValueOnce({
+      attributes: {},
+      listeners: {},
+      setNodeRef: jest.fn(),
+      transform: null,
+      transition: undefined,
+      isDragging: true
+    })
+
+    const singleDoc = [{ id: 'a', name: 'Alpha', filePath: '/a.md', orderIndex: 0, status: 'available' }]
+    const { container } = render(
+      <DocumentList documents={singleDoc} onOpen={jest.fn()} onReorder={jest.fn()} />
+    )
+
+    const styledDiv = container.querySelector('[style]')
+    expect(styledDiv).toHaveStyle({ opacity: 0.5, zIndex: 10 })
+  })
 })

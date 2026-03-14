@@ -71,6 +71,21 @@ describe('useDocuments', () => {
     expect(result.current.documents).toEqual(sampleDocs)
   })
 
+  test('importFiles does not refresh when api.importFiles fails', async () => {
+    api.getAll.mockResolvedValue({ success: true, documents: [] })
+    api.importFiles.mockResolvedValue({ success: false, imported: [], skipped: [], error: 'Cancelled' })
+
+    const { result } = renderHook(() => useDocuments())
+    await act(async () => {})
+
+    await act(async () => {
+      await result.current.importFiles()
+    })
+
+    expect(api.importFiles).toHaveBeenCalledTimes(1)
+    expect(api.getAll).toHaveBeenCalledTimes(1)
+  })
+
   test('removeDocument calls api.remove then refreshes', async () => {
     api.getAll
       .mockResolvedValueOnce({ success: true, documents: sampleDocs })
@@ -86,5 +101,63 @@ describe('useDocuments', () => {
 
     expect(api.remove).toHaveBeenCalledWith({ id: '1' })
     expect(result.current.documents).toEqual([sampleDocs[1]])
+  })
+
+  test('removeDocument does not refresh when api.remove fails', async () => {
+    api.getAll.mockResolvedValue({ success: true, documents: sampleDocs })
+    api.remove.mockResolvedValue({ success: false, error: 'Remove failed' })
+
+    const { result } = renderHook(() => useDocuments())
+    await act(async () => {})
+
+    await act(async () => {
+      await result.current.removeDocument('1')
+    })
+
+    expect(api.remove).toHaveBeenCalledWith({ id: '1' })
+    expect(api.getAll).toHaveBeenCalledTimes(1)
+  })
+
+  test('sets error when api.getAll throws an exception', async () => {
+    api.getAll.mockRejectedValue(new Error('Network error'))
+
+    const { result } = renderHook(() => useDocuments())
+    await act(async () => {})
+
+    expect(result.current.error).toBe('Network error')
+    expect(result.current.loading).toBe(false)
+    expect(result.current.documents).toEqual([])
+  })
+
+  test('reorderDocuments calls api.reorder and optimistically updates document order', async () => {
+    api.getAll.mockResolvedValue({ success: true, documents: sampleDocs })
+    api.reorder.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() => useDocuments())
+    await act(async () => {})
+
+    await act(async () => {
+      await result.current.reorderDocuments(['2', '1'])
+    })
+
+    expect(api.reorder).toHaveBeenCalledWith({ orderedIds: ['2', '1'] })
+    expect(result.current.documents[0].id).toBe('2')
+    expect(result.current.documents[0].orderIndex).toBe(0)
+    expect(result.current.documents[1].id).toBe('1')
+    expect(result.current.documents[1].orderIndex).toBe(1)
+  })
+
+  test('reorderDocuments does not update state when api.reorder fails', async () => {
+    api.getAll.mockResolvedValue({ success: true, documents: sampleDocs })
+    api.reorder.mockResolvedValue({ success: false, error: 'Reorder failed' })
+
+    const { result } = renderHook(() => useDocuments())
+    await act(async () => {})
+
+    await act(async () => {
+      await result.current.reorderDocuments(['2', '1'])
+    })
+
+    expect(result.current.documents).toEqual(sampleDocs)
   })
 })

@@ -103,6 +103,20 @@ describe('documents:import-files', () => {
     expect(result.imported).toHaveLength(0)
     expect(store.setDocuments).not.toHaveBeenCalled()
   })
+
+  test('returns error when an unexpected exception occurs', async () => {
+    dialog.showOpenDialog.mockResolvedValue({
+      canceled: false,
+      filePaths: ['/home/user/notes/readme.md']
+    })
+    store.getDocuments.mockImplementation(() => { throw new Error('Store failure') })
+
+    const result = await invokeHandler('documents:import-files')
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
+    expect(result.imported).toHaveLength(0)
+  })
 })
 
 // ── T021: documents:get-all ─────────────────────────────────────────────────
@@ -121,6 +135,50 @@ describe('documents:get-all', () => {
     expect(result.documents[0].status).toBe('available')
     expect(result.documents[1].id).toBe('2')
     expect(result.documents[1].status).toBe('missing')
+  })
+
+  test('returns error when getDocuments throws', async () => {
+    store.getDocuments.mockImplementation(() => { throw new Error('Storage error') })
+
+    const result = await invokeHandler('documents:get-all')
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
+    expect(result.documents).toHaveLength(0)
+  })
+})
+
+// ── documents:remove ────────────────────────────────────────────────────────
+describe('documents:remove', () => {
+  test('returns error when id is missing', async () => {
+    const result = await invokeHandler('documents:remove', {})
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('Missing id')
+  })
+
+  test('removes document by id and reindexes remaining documents', async () => {
+    store.getDocuments.mockReturnValue([
+      { id: '1', name: 'A', filePath: '/a.md', orderIndex: 0, importedAt: '' },
+      { id: '2', name: 'B', filePath: '/b.md', orderIndex: 1, importedAt: '' }
+    ])
+
+    const result = await invokeHandler('documents:remove', { id: '1' })
+
+    expect(result.success).toBe(true)
+    const saved = store.setDocuments.mock.calls[0][0]
+    expect(saved).toHaveLength(1)
+    expect(saved[0].id).toBe('2')
+    expect(saved[0].orderIndex).toBe(0)
+  })
+
+  test('returns error when getDocuments throws during remove', async () => {
+    store.getDocuments.mockImplementation(() => { throw new Error('Storage error') })
+
+    const result = await invokeHandler('documents:remove', { id: '1' })
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
   })
 })
 
@@ -149,6 +207,22 @@ describe('documents:reorder', () => {
     ])
 
     const result = await invokeHandler('documents:reorder', { orderedIds: ['a', 'unknown-id'] })
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBeDefined()
+  })
+
+  test('returns error when orderedIds is not an array', async () => {
+    const result = await invokeHandler('documents:reorder', { orderedIds: 'not-an-array' })
+
+    expect(result.success).toBe(false)
+    expect(result.error).toBe('orderedIds must be an array')
+  })
+
+  test('returns error when getDocuments throws during reorder', async () => {
+    store.getDocuments.mockImplementation(() => { throw new Error('Storage error') })
+
+    const result = await invokeHandler('documents:reorder', { orderedIds: ['a'] })
 
     expect(result.success).toBe(false)
     expect(result.error).toBeDefined()
@@ -185,5 +259,13 @@ describe('documents:read-content', () => {
 
     expect(result.success).toBe(false)
     expect(result.content).toBeNull()
+  })
+
+  test('returns error when id is missing', async () => {
+    const result = await invokeHandler('documents:read-content', {})
+
+    expect(result.success).toBe(false)
+    expect(result.content).toBeNull()
+    expect(result.error).toBe('Missing id')
   })
 })

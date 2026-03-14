@@ -1,0 +1,11 @@
+import { contextBridge, ipcRenderer } from 'electron'
+
+contextBridge.exposeInMainWorld('api', {
+  documents: {
+    importFiles: () => ipcRenderer.invoke('documents:import-files'),
+    getAll: () => ipcRenderer.invoke('documents:get-all'),
+    reorder: (payload) => ipcRenderer.invoke('documents:reorder', payload),
+    readContent: (payload) => ipcRenderer.invoke('documents:read-content', payload),
+    remove: (payload) => ipcRenderer.invoke('documents:remove', payload)
+  }
+})

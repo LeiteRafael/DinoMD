@@ -18,7 +18,8 @@ export default function EditorPage({
   editorHook,
   onBack,
   onDocumentSaved,
-  onDocumentDeleted
+  onDocumentDeleted,
+  onSplitView
 }) {
   const {
     session,
@@ -214,6 +215,15 @@ export default function EditorPage({
         </div>
 
         <div className={styles.actions}>
+          {onSplitView && (
+            <button
+              className={styles.splitBtn}
+              onClick={() => requestNavigation(onSplitView)}
+              aria-label="Open split view"
+            >
+              Split View
+            </button>
+          )}
           {!session.isDraft && (
             <button
               className={styles.deleteBtn}

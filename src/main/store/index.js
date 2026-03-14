@@ -11,7 +11,8 @@ const schema = {
         name: { type: 'string' },
         filePath: { type: 'string' },
         orderIndex: { type: 'number' },
-        importedAt: { type: 'string' }
+        importedAt: { type: 'string' },
+        mtimeMs: { type: 'number' }
       },
       required: ['id', 'name', 'filePath', 'orderIndex', 'importedAt']
     }
@@ -34,4 +35,25 @@ export function findDocumentById(id) {
 
 export function findDocumentByPath(filePath) {
   return getDocuments().find((doc) => doc.filePath === filePath) || null
+}
+
+/**
+ * Merge `patch` into the document with the given `id`. No-ops if not found.
+ */
+export function updateDocument(id, patch) {
+  const docs = getDocuments().map((doc) =>
+    doc.id === id ? { ...doc, ...patch } : doc
+  )
+  setDocuments(docs)
+}
+
+/**
+ * Remove a document by `id`, then rewrite contiguous `orderIndex` values.
+ */
+export function removeDocumentById(id) {
+  const docs = getDocuments().filter((doc) => doc.id !== id)
+  docs.forEach((doc, i) => {
+    doc.orderIndex = i
+  })
+  setDocuments(docs)
 }

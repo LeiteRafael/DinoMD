@@ -151,6 +151,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Integration work**: Database connections, middleware, logging, external services
    - **Polish and validation**: Unit tests, performance optimization, documentation
    - **ALWAYS apply the development skill**: Every JavaScript/JSX file created or edited **must** strictly follow the standards defined in `.github/skills/devolopment/SKILL.MD` — naming conventions, function design, variable declaration, conditionals, and all other guidelines defined there.
+   - **ALWAYS apply the testing skill**: Every test file created or edited **must** strictly follow the standards defined in `.github/skills/testing/SKILL.MD` — test structure, mocking patterns, assertions, test data, IPC handler setup, component and hook testing, and all other guidelines defined there. No comments in test files.
 
 8. Progress tracking and error handling:
    - Report progress after each completed task

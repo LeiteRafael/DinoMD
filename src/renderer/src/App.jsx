@@ -2,11 +2,12 @@ import { useState } from 'react'
 import MainPage from './pages/MainPage.jsx'
 import ReaderPage from './pages/ReaderPage.jsx'
 import EditorPage from './pages/EditorPage.jsx'
+import SplitViewPage from './pages/SplitViewPage.jsx'
 import useEditor from './hooks/useEditor.js'
 import useDocuments from './hooks/useDocuments.js'
 
 export default function App() {
-  const [view, setView] = useState('main') // 'main' | 'reader' | 'editor'
+  const [view, setView] = useState('main') // 'main' | 'reader' | 'editor' | 'split'
   const [activeDocumentId, setActiveDocumentId] = useState(null)
   const [activeDocumentName, setActiveDocumentName] = useState('')
 
@@ -46,6 +47,15 @@ export default function App() {
     setView('main')
   }
 
+  function handleOpenSplitView() {
+    setView('split')
+  }
+
+  function handleSplitViewBack() {
+    docsHook.refreshDocuments()
+    setView('main')
+  }
+
   // ── After successful first save of a draft ──────────────────────────────────
   function handleDocumentSaved() {
     docsHook.refreshDocuments()
@@ -58,6 +68,16 @@ export default function App() {
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
+  if (view === 'split') {
+    return (
+      <SplitViewPage
+        editorHook={editorHook}
+        onBack={handleSplitViewBack}
+        onDocumentSaved={handleDocumentSaved}
+      />
+    )
+  }
+
   if (view === 'editor') {
     return (
       <EditorPage
@@ -65,6 +85,7 @@ export default function App() {
         onBack={handleEditorBack}
         onDocumentSaved={handleDocumentSaved}
         onDocumentDeleted={handleDocumentDeleted}
+        onSplitView={handleOpenSplitView}
       />
     )
   }

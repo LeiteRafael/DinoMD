@@ -57,5 +57,5 @@ export default function useDocuments() {
     []
   )
 
-  return { documents, loading, error, importFiles, removeDocument, reorderDocuments }
+  return { documents, loading, error, importFiles, removeDocument, reorderDocuments, refreshDocuments: refresh }
 }

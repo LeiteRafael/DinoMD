@@ -1,0 +1,15 @@
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.empty {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 3rem;
+  font-style: italic;
+}

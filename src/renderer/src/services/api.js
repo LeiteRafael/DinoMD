@@ -1,4 +1,5 @@
 const documents = window.api?.documents ?? {}
+const uiApi = window.api?.ui ?? {}
 
 export const api = {
   importFiles: () => documents.importFiles?.() ?? Promise.resolve({ success: false, imported: [], skipped: [], error: 'API not available' }),
@@ -11,5 +12,9 @@ export const api = {
   rename: (payload) => documents.rename?.(payload) ?? Promise.resolve({ success: false, newFilePath: null, error: 'API not available' }),
   delete: (payload) => documents.delete?.(payload) ?? Promise.resolve({ success: false, canForceDelete: false, error: 'API not available' }),
   onFileChangedExternally: (callback) => window.api?.onFileChangedExternally?.(callback),
-  removeFileChangedListener: () => window.api?.removeFileChangedListener?.()
+  removeFileChangedListener: () => window.api?.removeFileChangedListener?.(),
+  ui: {
+    getSidebarState: () => uiApi.getSidebarState?.() ?? Promise.resolve({ open: true, widthPercent: 22 }),
+    setSidebarState: (payload) => uiApi.setSidebarState?.(payload) ?? Promise.resolve({ success: false, error: 'API not available' })
+  }
 }

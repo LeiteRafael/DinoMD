@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerDocumentHandlers, setMainWindow } from './ipc/documents.js'
+import { registerUiHandlers } from './ipc/ui.js'
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -37,6 +38,7 @@ function createWindow() {
 
 app.whenReady().then(() => {
   registerDocumentHandlers()
+  registerUiHandlers()
   createWindow()
 
   app.on('activate', () => {

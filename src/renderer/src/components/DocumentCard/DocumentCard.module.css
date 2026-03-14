@@ -1,0 +1,67 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.card:hover:not(.missing) {
+  box-shadow: var(--shadow);
+  border-color: var(--color-accent);
+}
+
+.card:active:not(.missing) {
+  transform: scale(0.99);
+}
+
+.missing {
+  cursor: default;
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.dragHandle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  cursor: grab;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--color-missing);
+  color: var(--color-surface);
+}

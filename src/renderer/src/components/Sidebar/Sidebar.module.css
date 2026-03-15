@@ -1,162 +1,164 @@
 .sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #1e1e2e;
-  border-right: 1px solid #313244;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #1e1e2e;
+    border-right: 1px solid #313244;
+    overflow: hidden;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────────── */
 
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 10px 8px;
-  flex-shrink: 0;
-  border-bottom: 1px solid #313244;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #313244;
 }
 
 .headerTitle {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #a6adc8;
-  user-select: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a6adc8;
+    user-select: none;
 }
 
 .headerActions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .newDocButton,
 .toggleButton {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #a6adc8;
-  font-size: 18px;
-  line-height: 1;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease, color 0.15s ease;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #a6adc8;
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
 }
 
 .newDocButton:hover,
 .toggleButton:hover {
-  background: #313244;
-  color: #cdd6f4;
+    background: #313244;
+    color: #cdd6f4;
 }
 
 /* ── Search ─────────────────────────────────────────────────────────────────── */
 
 .searchWrapper {
-  padding: 8px 10px;
-  flex-shrink: 0;
+    padding: 8px 10px;
+    flex-shrink: 0;
 }
 
 .searchInput {
-  width: 100%;
-  box-sizing: border-box;
-  background: #313244;
-  border: 1px solid #45475a;
-  border-radius: 6px;
-  color: #cdd6f4;
-  font-size: 13px;
-  padding: 6px 10px;
-  outline: none;
-  transition: border-color 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+    background: #313244;
+    border: 1px solid #45475a;
+    border-radius: 6px;
+    color: #cdd6f4;
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+    transition: border-color 0.15s ease;
 }
 
 .searchInput::placeholder {
-  color: #6c7086;
+    color: #6c7086;
 }
 
 .searchInput:focus {
-  border-color: #89b4fa;
+    border-color: #89b4fa;
 }
 
 /* ── Document list ───────────────────────────────────────────────────────────── */
 
 .list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 6px 8px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 6px 8px;
 }
 
 .list::-webkit-scrollbar {
-  width: 4px;
+    width: 4px;
 }
 
 .list::-webkit-scrollbar-thumb {
-  background: #45475a;
-  border-radius: 2px;
+    background: #45475a;
+    border-radius: 2px;
 }
 
 /* ── Empty / no-results states ───────────────────────────────────────────────── */
 
 .emptyState,
 .noResults {
-  padding: 24px 12px;
-  text-align: center;
-  font-size: 13px;
-  color: #6c7086;
-  user-select: none;
+    padding: 24px 12px;
+    text-align: center;
+    font-size: 13px;
+    color: #6c7086;
+    user-select: none;
 }
 
 /* ── Individual entry ────────────────────────────────────────────────────────── */
 
 .entry {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  box-sizing: border-box;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 8px 10px;
-  margin-bottom: 2px;
-  text-align: left;
-  transition: background 0.12s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 8px 10px;
+    margin-bottom: 2px;
+    text-align: left;
+    transition: background 0.12s ease;
 }
 
 .entry:hover {
-  background: #313244;
+    background: #313244;
 }
 
 .entryActive {
-  background: #45475a;
+    background: #45475a;
 }
 
 .entryActive:hover {
-  background: #585b70;
+    background: #585b70;
 }
 
 .entryTitle {
-  font-size: 13px;
-  font-weight: 500;
-  color: #cdd6f4;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 500;
+    color: #cdd6f4;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .entryPreview {
-  font-size: 11px;
-  color: #a6adc8;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  margin-top: 2px;
+    font-size: 11px;
+    color: #a6adc8;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-top: 2px;
 }

@@ -1,19 +1,152 @@
-.editor {
-  width: 100%;
-  height: 100%;
-  resize: none;
-  background: var(--color-bg);
-  color: var(--color-text);
-  border: none;
-  outline: none;
-  font-family: 'Fira Mono', 'Cascadia Code', 'Consolas', monospace;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  padding: 1.5rem;
-  box-sizing: border-box;
-  tab-size: 2;
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
-.editor::placeholder {
-  color: var(--color-text-muted);
+.gutter {
+    position: relative;
+    width: 3rem;
+    min-width: 3rem;
+    overflow: hidden;
+    background: var(--color-bg-alt);
+    text-align: right;
+    padding-top: 1.5rem;
+    flex-shrink: 0;
+    user-select: none;
 }
+
+.gutterInner {
+    will-change: transform; /* GPU-composited scroll sync */
+}
+
+.lineNumber {
+    height: 1.52rem; /* 0.95rem font × 1.6 line-height */
+    padding-right: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-family: 'Fira Mono', 'Cascadia Code', 'Consolas', monospace;
+    line-height: 1.6;
+}
+
+.gutterActiveLine {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.52rem;
+    background: var(--color-active-line, rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+    z-index: 1;
+}
+
+.editorContainer {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+.activeLineHighlight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.52rem;
+    background: var(--color-active-line, rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+    z-index: 0;
+}
+
+.highlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 1.5rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    pointer-events: none;
+    overflow: hidden;
+    font-family: 'Fira Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    tab-size: 2;
+    box-sizing: border-box;
+}
+
+.textarea {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--color-text);
+    border: none;
+    outline: none;
+    font-family: 'Fira Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    tab-size: 2;
+}
+
+.textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Token classes must be :global so dangerouslySetInnerHTML-injected spans match */
+:global(.token-h1) {
+    color: #e06c75;
+    font-weight: 700;
+}
+
+:global(.token-h2) {
+    color: #e5897e;
+    font-weight: 700;
+}
+
+:global(.token-h3) {
+    color: #eaa587;
+    font-weight: 600;
+}
+
+:global(.token-h4) {
+    color: #e8b98a;
+    font-weight: 600;
+}
+
+:global(.token-h5) {
+    color: #d4c582;
+    font-weight: 500;
+}
+
+:global(.token-h6) {
+    color: #c3c57e;
+    font-weight: 500;
+}
+
+:global(.token-bold) {
+    color: #d19a66;
+}
+
+:global(.token-link) {
+    color: #61afef;
+}
+
+:global(.token-code-fence) {
+    color: #98c379;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+:global(.token-code-block) {
+    color: #98c379;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* token-active-line removed — active line is now a positioned overlay div */

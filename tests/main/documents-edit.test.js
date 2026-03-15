@@ -150,7 +150,7 @@ describe('documents:save — existing document', () => {
 
     expect(dialog.showSaveDialog).not.toHaveBeenCalled()
     expect(fileUtils.writeFileUtf8).toHaveBeenCalledWith('/notes/my-doc.md', '# Updated content')
-    expect(store.updateDocument).toHaveBeenCalledWith('doc-001', { mtimeMs: 1700000000000 })
+    expect(store.updateDocument).toHaveBeenCalledWith('doc-001', { mtimeMs: 1700000000000, preview: 'Updated content' })
     expect(result.success).toBe(true)
     expect(result.canceled).toBe(false)
     expect(result.filePath).toBe('/notes/my-doc.md')

@@ -12,6 +12,10 @@ contextBridge.exposeInMainWorld('api', {
     rename: (payload) => ipcRenderer.invoke('documents:rename', payload),
     delete: (payload) => ipcRenderer.invoke('documents:delete', payload)
   },
+  ui: {
+    getSidebarState: () => ipcRenderer.invoke('ui:get-sidebar-state'),
+    setSidebarState: (payload) => ipcRenderer.invoke('ui:set-sidebar-state', payload)
+  },
   onFileChangedExternally: (callback) =>
     ipcRenderer.on('file:changed-externally', (_event, data) => callback(data)),
   removeFileChangedListener: () =>

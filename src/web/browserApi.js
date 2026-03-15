@@ -8,6 +8,19 @@
  */
 
 const DOCS_KEY = 'dinomd:docs'
+const UI_KEY = 'dinomd:ui'
+
+function generatePreview(content) {
+  if (!content || typeof content !== 'string') return ''
+  const stripped = content
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    .replace(/[*_~`>#\-+|]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return stripped.length > 150 ? stripped.slice(0, 150) + '\u2026' : stripped
+}
 
 function loadDocs() {
   try {
@@ -106,8 +119,9 @@ async function importFiles() {
       importedAt: new Date().toISOString()
     }
 
+    const preview = generatePreview(content)
     localStorage.setItem(contentKey(id), content)
-    imported.push(doc)
+    imported.push({ ...doc, preview, mtimeMs: Date.now() })
   }
 
   if (imported.length > 0) {
@@ -180,15 +194,18 @@ async function save({ id, filePath, name, content }) {
         filePath: resolvedPath,
         orderIndex: docs.length,
         importedAt: new Date().toISOString(),
-        mtimeMs
+        mtimeMs,
+        preview: generatePreview(content ?? '')
       }
       localStorage.setItem(contentKey(id), content ?? '')
       saveDocs([...docs, newDoc])
       return { success: true, canceled: false, filePath: resolvedPath, name: resolvedName, mtimeMs, error: null }
     }
-    // Existing document — update content and mtime
+    // Existing document — update content, mtime and preview
     const docs = loadDocs()
-    const updated = docs.map((d) => (d.id === id ? { ...d, mtimeMs } : d))
+    const updated = docs.map((d) =>
+      d.id === id ? { ...d, mtimeMs, preview: generatePreview(content ?? '') } : d
+    )
     localStorage.setItem(contentKey(id), content ?? '')
     saveDocs(updated)
     return { success: true, canceled: false, filePath, name: null, mtimeMs, error: null }
@@ -224,6 +241,34 @@ async function deleteDoc({ id }) {
   }
 }
 
+// ── UI state (sidebar open/width) ─────────────────────────────────────────────
+function loadUiState() {
+  try {
+    return JSON.parse(localStorage.getItem(UI_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
+
+async function getSidebarState() {
+  const stored = loadUiState()
+  return {
+    open: stored?.open ?? true,
+    widthPercent: stored?.widthPercent ?? 22
+  }
+}
+
+async function setSidebarState(patch) {
+  const current = (await getSidebarState())
+  const next = { ...current }
+  if (patch && typeof patch.open === 'boolean') next.open = patch.open
+  if (patch && typeof patch.widthPercent === 'number') {
+    next.widthPercent = Math.min(35, Math.max(15, patch.widthPercent))
+  }
+  localStorage.setItem(UI_KEY, JSON.stringify(next))
+  return { success: true }
+}
+
 // ── Export as the same shape consumed by services/api.js ─────────────────────
 export const api = {
   importFiles,
@@ -236,5 +281,6 @@ export const api = {
   rename: renameDoc,
   delete: deleteDoc,
   onFileChangedExternally: () => undefined,
-  removeFileChangedListener: () => undefined
+  removeFileChangedListener: () => undefined,
+  ui: { getSidebarState, setSidebarState }
 }

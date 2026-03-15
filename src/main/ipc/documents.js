@@ -19,6 +19,21 @@ import {
 import { promises as fs } from 'fs'
 import { basename, dirname, join } from 'path'
 
+/**
+ * Strip common Markdown tokens and return a plain-text preview capped at 150 chars.
+ */
+export function generatePreview(content) {
+  if (!content || typeof content !== 'string') return ''
+  const stripped = content
+    .replace(/^#{1,6}\s+/gm, '')          // headings
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // links / images
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')    // inline code
+    .replace(/[*_~`>#\-+|]/g, '')         // misc tokens
+    .replace(/\s+/g, ' ')
+    .trim()
+  return stripped.length > 150 ? stripped.slice(0, 150) + '\u2026' : stripped
+}
+
 // The main BrowserWindow reference — set via setMainWindow() after creation
 let _mainWindow = null
 
@@ -92,7 +107,15 @@ async function handleImportFiles() {
         importedAt: new Date().toISOString()
       }
 
-      imported.push(doc)
+      let preview = ''
+      try {
+        const rawContent = await readFileAsUtf8(filePath)
+        preview = generatePreview(rawContent)
+      } catch {
+        // preview stays empty if file can't be read for preview
+      }
+
+      imported.push({ ...doc, preview })
     }
 
     if (imported.length > 0) {
@@ -240,16 +263,17 @@ async function handleSave(_event, { id, filePath, name, content }) {
         filePath: chosenPath,
         orderIndex: docs.length,
         importedAt: new Date().toISOString(),
-        mtimeMs: stat.mtimeMs
+        mtimeMs: stat.mtimeMs,
+        preview: generatePreview(content)
       }
       setDocuments([...docs, newDoc])
       return { success: true, canceled: false, filePath: chosenPath, name: resolvedName, mtimeMs: stat.mtimeMs, error: null }
     }
 
-    // Existing document — write and update mtimeMs
+    // Existing document — write and update mtimeMs + regenerate preview
     await writeFileUtf8(filePath, content)
     const stat = await fs.stat(filePath)
-    updateDocument(id, { mtimeMs: stat.mtimeMs })
+    updateDocument(id, { mtimeMs: stat.mtimeMs, preview: generatePreview(content) })
     return { success: true, canceled: false, filePath, name: null, mtimeMs: stat.mtimeMs, error: null }
   } catch (err) {
     return { success: false, canceled: false, filePath: null, name: null, mtimeMs: null, error: err.message }

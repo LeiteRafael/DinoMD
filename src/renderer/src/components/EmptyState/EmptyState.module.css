@@ -1,40 +1,40 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4rem 2rem;
-  text-align: center;
-  color: var(--color-text-muted);
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    gap: 1rem;
 }
 
 .dino {
-  color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 .heading {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
 .sub {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 .btn {
-  margin-top: 0.5rem;
-  background: var(--color-accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  padding: 0.6rem 1.25rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: background 0.15s ease;
+    margin-top: 0.5rem;
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s ease;
 }
 
 .btn:hover {
-  background: var(--color-accent-hover);
+    background: var(--color-accent-hover);
 }

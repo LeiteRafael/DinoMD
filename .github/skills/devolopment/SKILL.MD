@@ -193,6 +193,7 @@ const useDocuments = () => {
 ## What not to do
 
 - Do not add comments explaining what code does — rename or refactor instead
+- Do not add comments about argument types, return types, or side effects — these should be clear from the code itself
 - Do not write functions that do two things joined by "and" in their name
 - Do not mix business logic with rendering logic inside components
 - Do not use magic numbers or magic strings — assign them to named constants

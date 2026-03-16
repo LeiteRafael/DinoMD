@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import MarkdownEditor from '../../src/renderer/src/components/MarkdownEditor/index.jsx'
-global.requestAnimationFrame = () => 0
 describe('MarkdownEditor', () => {
     test('renders a textarea with the provided value', () => {
         render(<MarkdownEditor value="# Hello" onChange={jest.fn()} />)
@@ -132,6 +131,27 @@ describe('MarkdownEditor gutter', () => {
         const lineNumbers = container.querySelectorAll('[class="lineNumber"]')
         expect(lineNumbers).toHaveLength(1)
     })
+    test('line-number divs have no inline height style', () => {
+        const { container } = render(
+            <MarkdownEditor value={'line1\nline2\nline3'} onChange={jest.fn()} />
+        )
+        const lineNumbers = container.querySelectorAll('[class="lineNumber"]')
+        lineNumbers.forEach((el) => {
+            expect(el.style.height).toBe('')
+        })
+    })
+    test('sizer element with class lineSizer is present in the DOM', () => {
+        const { container } = render(<MarkdownEditor value="text" onChange={jest.fn()} />)
+        const sizer = container.querySelector('[class="lineSizer"]')
+        expect(sizer).toBeInTheDocument()
+    })
+    test('each line-number div text contains a zero-width space', () => {
+        const { container } = render(<MarkdownEditor value={'line1\nline2'} onChange={jest.fn()} />)
+        const lineNumbers = container.querySelectorAll('[class="lineNumber"]')
+        lineNumbers.forEach((el) => {
+            expect(el.textContent).toContain('\u200B')
+        })
+    })
 })
 describe('MarkdownEditor syntax backdrop', () => {
     test('a pre element with aria-hidden="true" is present in the DOM', () => {
@@ -165,7 +185,7 @@ describe('MarkdownEditor active line', () => {
         })
         fireEvent.select(textarea)
         const overlay = container.querySelector('[class="gutterActiveLine"]')
-        expect(overlay.style.top).toBe('calc(3.02rem - 0px)')
+        expect(overlay.style.top).toBe('calc(1.5rem + 24.32px - 0px)')
     })
     test('onSelect with cursor on line 1 sets active overlay top to line-1 position', () => {
         const { container } = render(<MarkdownEditor value={'line1\nline2'} onChange={jest.fn()} />)
@@ -176,7 +196,7 @@ describe('MarkdownEditor active line', () => {
         })
         fireEvent.select(textarea)
         const overlay = container.querySelector('[class="gutterActiveLine"]')
-        expect(overlay.style.top).toBe('calc(1.5rem - 0px)')
+        expect(overlay.style.top).toBe('calc(1.5rem + 0px - 0px)')
     })
 })
 describe('MarkdownEditor auto-indent on Enter', () => {

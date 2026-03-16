@@ -31,7 +31,7 @@ jest.mock('react-markdown', () => {
                     codeLang = line.slice(3).trim() || 'text'
                     codeLines = []
                 } else {
-                    const codeStr = codeLines.join('\n')
+                    const codeStr = codeLines.join('\n') + '\n'
                     const CodeComponent = components?.code
                     if (CodeComponent) {
                         elements.push(
@@ -62,7 +62,17 @@ jest.mock('react-markdown', () => {
                 listItems.push(line.slice(2))
             } else if (line.trim()) {
                 flushList()
-                elements.push(<p key={i}>{line}</p>)
+                const inlineCodeMatch = line.match(/`([^`]+)`/)
+                if (inlineCodeMatch && components?.code) {
+                    const CodeComponent = components.code
+                    elements.push(
+                        <p key={i}>
+                            <CodeComponent key={`inline-${i}`}>{inlineCodeMatch[1]}</CodeComponent>
+                        </p>
+                    )
+                } else {
+                    elements.push(<p key={i}>{line}</p>)
+                }
             }
         })
         flushList()
@@ -95,6 +105,9 @@ console.log('hello')
 \`\`\``
 
 describe('MarkdownViewer', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
     test('renders an H1 from a markdown heading', async () => {
         await act(async () => {
             render(<MarkdownViewer rawMarkdown={sampleMarkdown} />)
@@ -134,5 +147,30 @@ describe('MarkdownViewer', () => {
     test('returns null when rawMarkdown is null', () => {
         const { container } = render(<MarkdownViewer rawMarkdown={null} />)
         expect(container.firstChild).toBeNull()
+    })
+    test('inline code renders as a code element and does not call codeToHtml', async () => {
+        await act(async () => {
+            render(<MarkdownViewer rawMarkdown={'Use `console.log` here'} />)
+        })
+        expect(screen.getByText('console.log').tagName.toLowerCase()).toBe('code')
+        expect(codeToHtml).not.toHaveBeenCalled()
+    })
+    test('language-less fenced code block calls codeToHtml with lang text', async () => {
+        await act(async () => {
+            render(<MarkdownViewer rawMarkdown={'```\nsome code\n```'} />)
+        })
+        expect(codeToHtml).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.objectContaining({ lang: 'text' })
+        )
+    })
+    test('fenced code block with language calls codeToHtml with that language', async () => {
+        await act(async () => {
+            render(<MarkdownViewer rawMarkdown={'```py\nprint(1)\n```'} />)
+        })
+        expect(codeToHtml).toHaveBeenCalledWith(
+            expect.stringContaining('print(1)'),
+            expect.objectContaining({ lang: 'py' })
+        )
     })
 })

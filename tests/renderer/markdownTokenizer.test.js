@@ -1,4 +1,4 @@
-import { tokenize } from '../../src/renderer/src/utils/markdownTokenizer'
+import { tokenize, tokenizeCodeLine } from '../../src/renderer/src/utils/markdownTokenizer'
 
 describe('tokenize', () => {
     test('# H1 heading produces output containing token-h1', () => {
@@ -25,16 +25,17 @@ describe('tokenize', () => {
         expect(result).toContain('token-link')
     })
 
-    test('code fence opening line produces output containing token-code-fence', () => {
+    test('fenced code block produces output containing token-code-region', () => {
         const result = tokenize('```\ncode\n```')
 
-        expect(result).toContain('token-code-fence')
+        expect(result).toContain('token-code-region')
     })
 
-    test('lines inside a fenced code block produce output containing token-code-block', () => {
+    test('lines inside a fenced code block are wrapped in token-code-region', () => {
         const result = tokenize('```\ncode line\n```')
 
-        expect(result).toContain('token-code-block')
+        expect(result).toContain('token-code-region')
+        expect(result).toContain('code line')
     })
 
     test('input containing <script> is HTML-escaped and raw < never appears in output', () => {
@@ -46,5 +47,53 @@ describe('tokenize', () => {
 
     test('empty string returns a single newline without error', () => {
         expect(tokenize('')).toBe('\n')
+    })
+})
+
+describe('tokenizeCodeLine', () => {
+    test('double-slash comment produces output containing token-code-comment', () => {
+        const result = tokenizeCodeLine('// this is a comment')
+
+        expect(result).toContain('token-code-comment')
+    })
+
+    test('hash comment produces output containing token-code-comment', () => {
+        const result = tokenizeCodeLine('# comment')
+
+        expect(result).toContain('token-code-comment')
+    })
+
+    test('double-quoted string produces output containing token-code-str', () => {
+        const result = tokenizeCodeLine('"hello"')
+
+        expect(result).toContain('token-code-str')
+    })
+
+    test('number literal produces output containing token-code-num', () => {
+        const result = tokenizeCodeLine('42')
+
+        expect(result).toContain('token-code-num')
+    })
+
+    test('keyword produces output containing token-code-kw', () => {
+        const result = tokenizeCodeLine('const x')
+
+        expect(result).toContain('token-code-kw')
+    })
+
+    test('operator produces output containing token-code-op', () => {
+        const result = tokenizeCodeLine('x = 1')
+
+        expect(result).toContain('token-code-op')
+    })
+
+    test('keyword inside a string does not produce token-code-kw', () => {
+        const result = tokenizeCodeLine('"const"')
+
+        expect(result).not.toContain('token-code-kw')
+    })
+
+    test('empty string returns empty string without error', () => {
+        expect(tokenizeCodeLine('')).toBe('')
     })
 })

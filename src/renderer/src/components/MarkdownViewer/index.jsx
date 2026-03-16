@@ -7,17 +7,24 @@ import { codeToHtml } from 'shiki'
 import styles from './MarkdownViewer.module.css'
 
 function CodeBlock({ className, children }) {
+    const rawChildren = String(children)
+    const isBlock = rawChildren.endsWith('\n')
     const rawLanguage = (className ?? '').replace('language-', '') || 'text'
-    const code = String(children).replace(/\n$/, '')
+    const code = rawChildren.replace(/\n$/, '')
     const [html, setHtml] = useState('')
 
     useEffect(() => {
+        if (!isBlock) return
         codeToHtml(code, { lang: rawLanguage, theme: 'github-dark' })
             .then(setHtml)
             .catch(() => {
                 setHtml(`<pre data-language="${rawLanguage}"><code>${code}</code></pre>`)
             })
-    }, [code, rawLanguage])
+    }, [isBlock, code, rawLanguage])
+
+    if (!isBlock) {
+        return <code className={className}>{children}</code>
+    }
 
     if (html) {
         return (

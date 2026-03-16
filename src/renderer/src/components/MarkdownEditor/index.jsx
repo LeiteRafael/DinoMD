@@ -1,18 +1,42 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react'
 import { tokenize } from '../../utils/markdownTokenizer'
 import styles from './MarkdownEditor.module.css'
-const LINE_HEIGHT_REM = 0.95 * 1.6
+const INITIAL_LINE_HEIGHT_PX = 24.32
 const PADDING_TOP_REM = 1.5
 export default function MarkdownEditor({ value, onChange, placeholder, textareaRef, onScroll }) {
     const [activeLine, setActiveLine] = useState(1)
     const [scrollTop, setScrollTop] = useState(0)
     const [localValue, setLocalValue] = useState(value)
+    const [lineHeightPx, setLineHeightPx] = useState(INITIAL_LINE_HEIGHT_PX)
     const preRef = useRef(null)
+    const sizerRef = useRef(null)
     useEffect(() => {
         setLocalValue(value)
     }, [value])
+    useEffect(() => {
+        if (!sizerRef.current) return
+        const initialHeight = sizerRef.current.getBoundingClientRect().height
+        if (initialHeight > 0) setLineHeightPx(initialHeight)
+        const observer = new ResizeObserver(([entry]) => {
+            const height = entry.contentRect.height
+            if (height > 0) setLineHeightPx(height)
+        })
+        observer.observe(sizerRef.current)
+        return () => observer.disconnect()
+    }, [])
     const lineCount = useMemo(() => localValue.split('\n').length, [localValue])
     const highlightedHtml = useMemo(() => tokenize(localValue), [localValue])
+    const [codeRegionRects, setCodeRegionRects] = useState([])
+    useLayoutEffect(() => {
+        if (!preRef.current) return
+        const spans = preRef.current.querySelectorAll('.token-code-region')
+        setCodeRegionRects(
+            Array.from(spans).map((span) => ({
+                top: span.offsetTop,
+                height: span.offsetHeight,
+            }))
+        )
+    }, [highlightedHtml])
     const gutterLines = useMemo(
         () =>
             Array.from(
@@ -22,12 +46,14 @@ export default function MarkdownEditor({ value, onChange, placeholder, textareaR
                 (_, i) => (
                     <div key={i} className={styles.lineNumber}>
                         {i + 1}
+                        {'\u200B'}
                     </div>
                 )
             ),
         [lineCount]
     )
-    const activeLineTop = `calc(${PADDING_TOP_REM + (activeLine - 1) * LINE_HEIGHT_REM}rem - ${scrollTop}px)`
+    const activeLineTop = `calc(${PADDING_TOP_REM}rem + ${(activeLine - 1) * lineHeightPx}px - ${scrollTop}px)`
+    const activeLineStyle = { top: activeLineTop, height: `${lineHeightPx}px` }
     function updateActiveLine(e) {
         const line = localValue.slice(0, e.target.selectionStart).split('\n').length
         setActiveLine(line)
@@ -67,14 +93,12 @@ export default function MarkdownEditor({ value, onChange, placeholder, textareaR
     }
     return (
         <div className={styles.wrapper}>
+            <span ref={sizerRef} aria-hidden="true" className={styles.lineSizer}>
+                {'\u200B'}
+            </span>
             <div className={styles.gutter} aria-hidden="true">
                 {}
-                <div
-                    className={styles.gutterActiveLine}
-                    style={{
-                        top: activeLineTop,
-                    }}
-                />
+                <div className={styles.gutterActiveLine} style={activeLineStyle} />
                 <div
                     className={styles.gutterInner}
                     style={{
@@ -87,12 +111,17 @@ export default function MarkdownEditor({ value, onChange, placeholder, textareaR
 
             <div className={styles.editorContainer}>
                 {}
-                <div
-                    className={styles.activeLineHighlight}
-                    style={{
-                        top: activeLineTop,
-                    }}
-                />
+                {codeRegionRects.map(({ top, height }, i) => (
+                    <div
+                        key={i}
+                        className={styles.codeBlockBackground}
+                        style={{
+                            top: `${top - scrollTop}px`,
+                            height: `${height}px`,
+                        }}
+                    />
+                ))}
+                <div className={styles.activeLineHighlight} style={activeLineStyle} />
                 <pre
                     ref={preRef}
                     className={styles.highlight}

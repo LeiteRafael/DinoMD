@@ -21,6 +21,12 @@
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+    --syn-kw: #cf222e;
+    --syn-str: #0a3069;
+    --syn-num: #0550ae;
+    --syn-comment: #6e7781;
+    --syn-op: #24292f;
+    --syn-code-base: #24292f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -34,6 +40,12 @@
         --color-accent-hover: #7ecf95;
         --color-missing: #4a5568;
         --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --syn-kw: #569cd6;
+        --syn-str: #ce9178;
+        --syn-num: #b5cea8;
+        --syn-comment: #6a9955;
+        --syn-op: #d4d4d4;
+        --syn-code-base: #d4d4d4;
     }
 }
 

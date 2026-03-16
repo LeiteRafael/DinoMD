@@ -3,7 +3,25 @@ const BOLD_PATTERN = /\*\*(.+?)\*\*/g
 const LINK_PATTERN = /\[([^\]]+)\]\([^)]+\)/g
 const CODE_FENCE_PATTERN = /^```/
 
+const CODE_TOKEN_RE =
+    /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)|((\/\/).*$|(#).*$)|(\b\d+\.?\d*\b)|\b(if|else|for|while|return|function|const|let|var|class|def|import|export|from|in|of|do|switch|case|break|continue|try|catch|finally|new|typeof|void|async|await|static|public|private|protected|true|false|null|undefined)\b|([+\-*/%=!|^~?:]+|[(){}[\];,.])/g
+
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
+export const tokenizeCodeLine = (escapedLine) =>
+    escapedLine.replace(CODE_TOKEN_RE, (match, g1, g2, _g3, _g4, g5, g6) => {
+        const cls =
+            g1 !== undefined
+                ? 'token-code-str'
+                : g2 !== undefined
+                  ? 'token-code-comment'
+                  : g5 !== undefined
+                    ? 'token-code-num'
+                    : g6 !== undefined
+                      ? 'token-code-kw'
+                      : 'token-code-op'
+        return `<span class="${cls}">${match}</span>`
+    })
 
 const applyInlineTokens = (escapedLine) =>
     escapedLine
@@ -13,7 +31,7 @@ const applyInlineTokens = (escapedLine) =>
 const classifyLine = (escapedLine, isInCodeBlock) => {
     if (CODE_FENCE_PATTERN.test(escapedLine)) return { type: 'code-fence', content: escapedLine }
 
-    if (isInCodeBlock) return { type: 'code-block', content: escapedLine }
+    if (isInCodeBlock) return { type: 'code-block', content: tokenizeCodeLine(escapedLine) }
 
     const headingMatch = escapedLine.match(HEADING_PATTERN)
     if (headingMatch) {
@@ -34,17 +52,39 @@ export const tokenize = (text) => {
 
     const lines = text.split('\n')
     let isInCodeBlock = false
+    let codeBlockLines = []
+    const parts = []
 
-    const tokenized = lines.map((line) => {
+    const flushCodeBlock = () => {
+        parts.push(`<span class="token-code-region">${codeBlockLines.join('\n')}</span>`)
+        codeBlockLines = []
+    }
+
+    lines.forEach((line) => {
         const escapedLine = escapeHtml(line)
-        const classified = classifyLine(escapedLine, isInCodeBlock)
 
-        if (classified.type === 'code-fence') {
-            isInCodeBlock = !isInCodeBlock
+        if (CODE_FENCE_PATTERN.test(escapedLine)) {
+            if (!isInCodeBlock) {
+                isInCodeBlock = true
+                codeBlockLines = [escapedLine]
+            } else {
+                codeBlockLines.push(escapedLine)
+                flushCodeBlock()
+                isInCodeBlock = false
+            }
+            return
         }
 
-        return wrapLine(classified.type, classified.content)
+        if (isInCodeBlock) {
+            codeBlockLines.push(tokenizeCodeLine(escapedLine))
+            return
+        }
+
+        const classified = classifyLine(escapedLine, false)
+        parts.push(wrapLine(classified.type, classified.content))
     })
 
-    return tokenized.join('\n') + '\n'
+    if (codeBlockLines.length > 0) flushCodeBlock()
+
+    return parts.join('\n') + '\n'
 }

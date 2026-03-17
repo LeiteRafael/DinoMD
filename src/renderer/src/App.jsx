@@ -8,10 +8,12 @@ import Sidebar from './components/Sidebar/index.jsx'
 import useEditor from './hooks/useEditor.js'
 import useDocuments from './hooks/useDocuments.js'
 import useSidebar from './hooks/useSidebar.js'
+import { api } from './services/api.js'
 export default function App() {
     const [view, setView] = useState('main')
     const [activeDocumentId, setActiveDocumentId] = useState(null)
     const [activeDocumentName, setActiveDocumentName] = useState('')
+    const [activeFilePath, setActiveFilePath] = useState(null)
     const editorHook = useEditor()
     const docsHook = useDocuments()
     const sidebarHook = useSidebar()
@@ -79,13 +81,24 @@ export default function App() {
         setActiveDocumentName(name)
         setView('reader')
     }
+    async function handleTreeOpenFile(filePath) {
+        if (editorHook.isDirty) {
+            await editorHook.save()
+        }
+        const result = await api.folder.readFile(filePath)
+        if (!result || !result.success) return
+        const name = filePath.split(/[\\/]/).pop() ?? filePath
+        editorHook.openFromFilePath(filePath, result.content, name)
+        setActiveFilePath(filePath)
+        setView('editor')
+    }
     function withSidebar(pageNode) {
         const sidebar = (
             <Sidebar
-                documents={sortedDocuments}
-                activeDocumentId={activeDocumentId}
-                onOpenDocument={handleSidebarOpenDocument}
-                onNewDocument={handleNewDocument}
+                rootFolderPath={sidebarHook.rootFolderPath}
+                activeFilePath={activeFilePath}
+                onOpenFile={handleTreeOpenFile}
+                onRootFolderChange={sidebarHook.persistRootFolderPath}
                 onToggle={sidebarHook.toggle}
             />
         )
@@ -154,7 +167,7 @@ export default function App() {
         )
     }
     if (view === 'main') {
-        return (
+        return withSidebar(
             <MainPage
                 docsHook={docsHook}
                 onOpenDocument={handleOpenDocument}

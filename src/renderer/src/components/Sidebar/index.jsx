@@ -1,17 +1,118 @@
 import { useState } from 'react'
+import useFileTree from '../../hooks/useFileTree.js'
 import useDebounce from '../../hooks/useDebounce.js'
+import TreeNode from './TreeNode.jsx'
 import styles from './Sidebar.module.css'
 
+function basename(filePath) {
+    if (!filePath) return ''
+    return filePath.split(/[\\/]/).filter(Boolean).pop() ?? filePath
+}
+
 export default function Sidebar({
+    // ── File-tree mode (feature 007) ─────────────────────────────────────────
+    // Pass rootFolderPath (even if null) to activate file-tree mode.
+    rootFolderPath,
+    activeFilePath = null,
+    onOpenFile,
+    onRootFolderChange,
+    // ── Shared ────────────────────────────────────────────────────────────────
+    onToggle,
+    // ── Document-list mode (feature 004 legacy) ───────────────────────────────
     documents = [],
     activeDocumentId = null,
     onOpenDocument,
     onNewDocument,
-    onToggle,
 }) {
+    const useFileTreeMode = rootFolderPath !== undefined
+
+    // Always call hook; it is a no-op when initialRootFolderPath is null.
+    const treeState = useFileTree({
+        initialRootFolderPath: useFileTreeMode ? rootFolderPath : null,
+        onRootFolderChange,
+    })
+
+    // ── Document-list state (legacy) ──────────────────────────────────────────
     const [query, setQuery] = useState('')
     const debouncedQuery = useDebounce(query, 150)
 
+    // ── Render: file-tree mode ────────────────────────────────────────────────
+    if (useFileTreeMode) {
+        const { rootEntries, expandedPaths, loading, error, openFolder, toggleFolder } = treeState
+        const folderName = treeState.rootFolderPath ? basename(treeState.rootFolderPath) : null
+
+        return (
+            <div className={styles.sidebar}>
+                {/* Header */}
+                <div className={styles.header}>
+                    <span className={styles.headerTitle}>{folderName ?? 'Explorer'}</span>
+                    <div className={styles.headerActions}>
+                        <button
+                            className={styles.openFolderButton}
+                            onClick={openFolder}
+                            title="Open Folder"
+                            aria-label="Open Folder"
+                        >
+                            📂
+                        </button>
+                        <button
+                            className={styles.toggleButton}
+                            onClick={() => onToggle?.()}
+                            title="Toggle sidebar"
+                            aria-label="Toggle sidebar"
+                        >
+                            ‹
+                        </button>
+                    </div>
+                </div>
+
+                {/* Body */}
+                <div className={styles.list}>
+                    {/* Empty state — no folder selected */}
+                    {!treeState.rootFolderPath && !loading && (
+                        <div className={styles.emptyState}>
+                            <p>No folder open</p>
+                            <button className={styles.openFolderCta} onClick={openFolder}>
+                                Open Folder
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Loading */}
+                    {treeState.rootFolderPath && loading && (
+                        <div className={styles.emptyState}>Loading…</div>
+                    )}
+
+                    {/* Error */}
+                    {treeState.rootFolderPath && !loading && error && (
+                        <div className={styles.emptyState}>{error}</div>
+                    )}
+
+                    {/* Empty folder */}
+                    {treeState.rootFolderPath && !loading && !error && rootEntries.length === 0 && (
+                        <div className={styles.emptyState}>This folder is empty.</div>
+                    )}
+
+                    {/* Tree nodes */}
+                    {treeState.rootFolderPath &&
+                        !loading &&
+                        !error &&
+                        rootEntries.map((node) => (
+                            <TreeNode
+                                key={node.path}
+                                node={node}
+                                expandedPaths={expandedPaths}
+                                onToggle={toggleFolder}
+                                onOpenFile={onOpenFile}
+                                activeFilePath={activeFilePath}
+                            />
+                        ))}
+                </div>
+            </div>
+        )
+    }
+
+    // ── Render: document-list mode (legacy feature 004) ───────────────────────
     const filteredDocuments = debouncedQuery
         ? documents.filter((doc) => {
               const q = debouncedQuery.toLowerCase()

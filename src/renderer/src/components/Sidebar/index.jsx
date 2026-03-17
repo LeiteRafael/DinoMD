@@ -10,15 +10,11 @@ function basename(filePath) {
 }
 
 export default function Sidebar({
-    // ── File-tree mode (feature 007) ─────────────────────────────────────────
-    // Pass rootFolderPath (even if null) to activate file-tree mode.
     rootFolderPath,
     activeFilePath = null,
     onOpenFile,
     onRootFolderChange,
-    // ── Shared ────────────────────────────────────────────────────────────────
     onToggle,
-    // ── Document-list mode (feature 004 legacy) ───────────────────────────────
     documents = [],
     activeDocumentId = null,
     onOpenDocument,
@@ -26,24 +22,20 @@ export default function Sidebar({
 }) {
     const useFileTreeMode = rootFolderPath !== undefined
 
-    // Always call hook; it is a no-op when initialRootFolderPath is null.
     const treeState = useFileTree({
         initialRootFolderPath: useFileTreeMode ? rootFolderPath : null,
         onRootFolderChange,
     })
 
-    // ── Document-list state (legacy) ──────────────────────────────────────────
     const [query, setQuery] = useState('')
     const debouncedQuery = useDebounce(query, 150)
 
-    // ── Render: file-tree mode ────────────────────────────────────────────────
     if (useFileTreeMode) {
         const { rootEntries, expandedPaths, loading, error, openFolder, toggleFolder } = treeState
         const folderName = treeState.rootFolderPath ? basename(treeState.rootFolderPath) : null
 
         return (
             <div className={styles.sidebar}>
-                {/* Header */}
                 <div className={styles.header}>
                     <span className={styles.headerTitle}>{folderName ?? 'Explorer'}</span>
                     <div className={styles.headerActions}>
@@ -66,9 +58,7 @@ export default function Sidebar({
                     </div>
                 </div>
 
-                {/* Body */}
                 <div className={styles.list}>
-                    {/* Empty state — no folder selected */}
                     {!treeState.rootFolderPath && !loading && (
                         <div className={styles.emptyState}>
                             <p>No folder open</p>
@@ -78,22 +68,18 @@ export default function Sidebar({
                         </div>
                     )}
 
-                    {/* Loading */}
                     {treeState.rootFolderPath && loading && (
                         <div className={styles.emptyState}>Loading…</div>
                     )}
 
-                    {/* Error */}
                     {treeState.rootFolderPath && !loading && error && (
                         <div className={styles.emptyState}>{error}</div>
                     )}
 
-                    {/* Empty folder */}
                     {treeState.rootFolderPath && !loading && !error && rootEntries.length === 0 && (
                         <div className={styles.emptyState}>This folder is empty.</div>
                     )}
 
-                    {/* Tree nodes */}
                     {treeState.rootFolderPath &&
                         !loading &&
                         !error &&
@@ -112,7 +98,6 @@ export default function Sidebar({
         )
     }
 
-    // ── Render: document-list mode (legacy feature 004) ───────────────────────
     const filteredDocuments = debouncedQuery
         ? documents.filter((doc) => {
               const q = debouncedQuery.toLowerCase()

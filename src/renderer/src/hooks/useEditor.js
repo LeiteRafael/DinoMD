@@ -70,7 +70,6 @@ export default function useEditor() {
         setSaving(true)
         setError(null)
         try {
-            // File-tree mode: no documentId, write directly to disk path
             if (!session.documentId && session.filePath) {
                 const content = contentRef.current || session.content
                 const result = await api.folder.writeFile(session.filePath, content)

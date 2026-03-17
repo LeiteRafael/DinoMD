@@ -17,9 +17,6 @@ export default function App() {
     const editorHook = useEditor()
     const docsHook = useDocuments()
     const sidebarHook = useSidebar()
-    const sortedDocuments = [...(docsHook.documents ?? [])].sort(
-        (a, b) => (b.mtimeMs ?? 0) - (a.mtimeMs ?? 0)
-    )
     useEffect(() => {
         if (!activeDocumentId) return
         const ids = new Set((docsHook.documents ?? []).map((d) => d.id))
@@ -29,11 +26,7 @@ export default function App() {
             setView('main')
         }
     }, [docsHook.documents, activeDocumentId])
-    function handleOpenDocument(id, name) {
-        setActiveDocumentId(id)
-        setActiveDocumentName(name)
-        setView('reader')
-    }
+
     function handleBack() {
         setActiveDocumentId(null)
         setActiveDocumentName('')
@@ -76,7 +69,7 @@ export default function App() {
     function handleDocumentRenamed() {
         docsHook.refreshDocuments()
     }
-    function handleSidebarOpenDocument(id, name) {
+    function handleOpenDocument(id, name) {
         setActiveDocumentId(id)
         setActiveDocumentName(name)
         setView('reader')

@@ -1,9 +1,14 @@
 const mockHandlers = {}
+const mockWindow = {}
 const ipcMain = {
     handle: jest.fn((channel, handler) => {
         mockHandlers[channel] = handler
     }),
     removeHandler: jest.fn(),
+}
+const BrowserWindow = {
+    fromWebContents: jest.fn(() => mockWindow),
+    getAllWindows: jest.fn(() => []),
 }
 const dialog = {
     showOpenDialog: jest.fn(),
@@ -22,7 +27,7 @@ const app = {
 async function invokeHandler(channel, ...args) {
     const handler = mockHandlers[channel]
     if (!handler) throw new Error(`No ipcMain handler registered for: ${channel}`)
-    return handler({}, ...args)
+    return handler({ sender: {} }, ...args)
 }
 function resetMocks() {
     Object.keys(mockHandlers).forEach((k) => delete mockHandlers[k])
@@ -30,6 +35,7 @@ function resetMocks() {
 }
 module.exports = {
     ipcMain,
+    BrowserWindow,
     dialog,
     shell,
     app,

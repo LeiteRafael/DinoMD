@@ -8,16 +8,15 @@ import Sidebar from './components/Sidebar/index.jsx'
 import useEditor from './hooks/useEditor.js'
 import useDocuments from './hooks/useDocuments.js'
 import useSidebar from './hooks/useSidebar.js'
+import { api } from './services/api.js'
 export default function App() {
     const [view, setView] = useState('main')
     const [activeDocumentId, setActiveDocumentId] = useState(null)
     const [activeDocumentName, setActiveDocumentName] = useState('')
+    const [activeFilePath, setActiveFilePath] = useState(null)
     const editorHook = useEditor()
     const docsHook = useDocuments()
     const sidebarHook = useSidebar()
-    const sortedDocuments = [...(docsHook.documents ?? [])].sort(
-        (a, b) => (b.mtimeMs ?? 0) - (a.mtimeMs ?? 0)
-    )
     useEffect(() => {
         if (!activeDocumentId) return
         const ids = new Set((docsHook.documents ?? []).map((d) => d.id))
@@ -27,11 +26,7 @@ export default function App() {
             setView('main')
         }
     }, [docsHook.documents, activeDocumentId])
-    function handleOpenDocument(id, name) {
-        setActiveDocumentId(id)
-        setActiveDocumentName(name)
-        setView('reader')
-    }
+
     function handleBack() {
         setActiveDocumentId(null)
         setActiveDocumentName('')
@@ -74,18 +69,29 @@ export default function App() {
     function handleDocumentRenamed() {
         docsHook.refreshDocuments()
     }
-    function handleSidebarOpenDocument(id, name) {
+    function handleOpenDocument(id, name) {
         setActiveDocumentId(id)
         setActiveDocumentName(name)
         setView('reader')
     }
+    async function handleTreeOpenFile(filePath) {
+        if (editorHook.isDirty) {
+            await editorHook.save()
+        }
+        const result = await api.folder.readFile(filePath)
+        if (!result || !result.success) return
+        const name = filePath.split(/[\\/]/).pop() ?? filePath
+        editorHook.openFromFilePath(filePath, result.content, name)
+        setActiveFilePath(filePath)
+        setView('editor')
+    }
     function withSidebar(pageNode) {
         const sidebar = (
             <Sidebar
-                documents={sortedDocuments}
-                activeDocumentId={activeDocumentId}
-                onOpenDocument={handleSidebarOpenDocument}
-                onNewDocument={handleNewDocument}
+                rootFolderPath={sidebarHook.rootFolderPath}
+                activeFilePath={activeFilePath}
+                onOpenFile={handleTreeOpenFile}
+                onRootFolderChange={sidebarHook.persistRootFolderPath}
                 onToggle={sidebarHook.toggle}
             />
         )
@@ -154,7 +160,7 @@ export default function App() {
         )
     }
     if (view === 'main') {
-        return (
+        return withSidebar(
             <MainPage
                 docsHook={docsHook}
                 onOpenDocument={handleOpenDocument}

@@ -70,6 +70,21 @@ export default function useEditor() {
         setSaving(true)
         setError(null)
         try {
+            if (!session.documentId && session.filePath) {
+                const content = contentRef.current || session.content
+                const result = await api.folder.writeFile(session.filePath, content)
+                if (!result.success) {
+                    setError(result.error)
+                    return { saved: false, canceled: false }
+                }
+                setSession((prev) => ({ ...prev, savedContent: prev.content }))
+                return {
+                    saved: true,
+                    canceled: false,
+                    filePath: session.filePath,
+                    name: session.name,
+                }
+            }
             const result = await api.save({
                 id: session.documentId,
                 filePath: session.filePath,
@@ -162,6 +177,19 @@ export default function useEditor() {
         },
         [session.documentId]
     )
+    const openFromFilePath = useCallback((filePath, content, name) => {
+        contentRef.current = content
+        setSession({
+            documentId: null,
+            filePath,
+            name,
+            content,
+            savedContent: content,
+            mtimeMs: null,
+            isDraft: false,
+        })
+        setError(null)
+    }, [])
     const reloadContent = useCallback(async () => {
         if (!session.documentId) return
         const result = await api.readContent({
@@ -186,6 +214,7 @@ export default function useEditor() {
         setError,
         openNew,
         openExisting,
+        openFromFilePath,
         updateContent,
         save,
         rename,

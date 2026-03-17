@@ -1,4 +1,31 @@
 import { promises as fs, watch } from 'fs'
+import { join } from 'path'
+
+const SYSTEM_NAMES = new Set(['node_modules', '.git', '.DS_Store', '.hg', '.svn', 'dist', 'build'])
+
+function isVisible(dirent) {
+    if (dirent.name.startsWith('.')) return false
+    if (SYSTEM_NAMES.has(dirent.name)) return false
+    return true
+}
+
+function compareEntries(a, b) {
+    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+}
+
+export async function readDirFiltered(dirPath) {
+    const entries = await fs.readdir(dirPath, { withFileTypes: true })
+    return entries
+        .filter(isVisible)
+        .map((dirent) => ({
+            name: dirent.name,
+            isDirectory: dirent.isDirectory(),
+            path: join(dirPath, dirent.name),
+        }))
+        .sort(compareEntries)
+}
+
 export async function readFileAsUtf8(filePath) {
     return fs.readFile(filePath, 'utf8')
 }

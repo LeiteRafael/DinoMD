@@ -1,5 +1,96 @@
 const DOCS_KEY = 'dinomd:docs'
 const UI_KEY = 'dinomd:ui'
+
+const SYSTEM_NAMES = new Set(['node_modules', '.git', '.DS_Store', '.hg', '.svn', 'dist', 'build'])
+
+function isVisible(name) {
+    if (name.startsWith('.')) return false
+    if (SYSTEM_NAMES.has(name)) return false
+    return true
+}
+
+function compareEntries(a, b) {
+    if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+}
+
+let rootHandle = null
+let rootVirtualPath = null
+
+async function resolveHandleAtPath(pathStr) {
+    if (!rootHandle) return null
+    const isRoot = pathStr === rootVirtualPath
+    if (isRoot) return rootHandle
+    const relative = pathStr.slice(rootVirtualPath.length + 1).split('/')
+    let current = rootHandle
+    for (const part of relative) {
+        if (!part) continue
+        current = await current.getDirectoryHandle(part)
+    }
+    return current
+}
+
+async function folderOpenPicker() {
+    try {
+        const handle = await window.showDirectoryPicker({ mode: 'read' })
+        rootHandle = handle
+        rootVirtualPath = handle.name
+        return rootVirtualPath
+    } catch {
+        return null
+    }
+}
+
+async function folderReadDir(dirPath) {
+    try {
+        const handle = await resolveHandleAtPath(dirPath)
+        if (!handle) return { error: 'Folder not opened' }
+        const entries = []
+        for await (const [name, entry] of handle.entries()) {
+            if (!isVisible(name)) continue
+            entries.push({
+                name,
+                isDirectory: entry.kind === 'directory',
+                path: `${dirPath}/${name}`,
+            })
+        }
+        entries.sort(compareEntries)
+        return entries
+    } catch (err) {
+        return { error: err.message }
+    }
+}
+
+async function folderReadFile(filePath) {
+    try {
+        const parts = filePath.split('/')
+        const fileName = parts.pop()
+        const dirPath = parts.join('/')
+        const dirHandle = await resolveHandleAtPath(dirPath)
+        const fileHandle = await dirHandle.getFileHandle(fileName)
+        const file = await fileHandle.getFile()
+        const content = await file.text()
+        return { success: true, content }
+    } catch (err) {
+        return { success: false, error: err.message }
+    }
+}
+
+async function folderWriteFile(filePath, content) {
+    try {
+        const parts = filePath.split('/')
+        const fileName = parts.pop()
+        const dirPath = parts.join('/')
+        const dirHandle = await resolveHandleAtPath(dirPath)
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: false })
+        const writable = await fileHandle.createWritable()
+        await writable.write(content)
+        await writable.close()
+        return { success: true }
+    } catch (err) {
+        return { success: false, error: err.message }
+    }
+}
 function generatePreview(content) {
     if (!content || typeof content !== 'string') return ''
     const stripped = content
@@ -320,21 +411,21 @@ async function getSidebarState() {
     return {
         open: stored?.open ?? true,
         widthPercent: stored?.widthPercent ?? 22,
+        rootFolderPath: stored?.rootFolderPath ?? null,
     }
 }
 async function setSidebarState(patch) {
     const current = await getSidebarState()
-    const next = {
-        ...current,
-    }
+    const next = { ...current }
     if (patch && typeof patch.open === 'boolean') next.open = patch.open
     if (patch && typeof patch.widthPercent === 'number') {
         next.widthPercent = Math.min(35, Math.max(15, patch.widthPercent))
     }
-    localStorage.setItem(UI_KEY, JSON.stringify(next))
-    return {
-        success: true,
+    if (patch && (typeof patch.rootFolderPath === 'string' || patch.rootFolderPath === null)) {
+        next.rootFolderPath = patch.rootFolderPath
     }
+    localStorage.setItem(UI_KEY, JSON.stringify(next))
+    return { success: true }
 }
 export const api = {
     importFiles,
@@ -348,6 +439,12 @@ export const api = {
     delete: deleteDoc,
     onFileChangedExternally: () => undefined,
     removeFileChangedListener: () => undefined,
+    folder: {
+        openPicker: folderOpenPicker,
+        readDir: folderReadDir,
+        readFile: folderReadFile,
+        writeFile: folderWriteFile,
+    },
     ui: {
         getSidebarState,
         setSidebarState,

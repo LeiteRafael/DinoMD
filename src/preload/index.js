@@ -12,6 +12,13 @@ contextBridge.exposeInMainWorld('api', {
         rename: (payload) => ipcRenderer.invoke('documents:rename', payload),
         delete: (payload) => ipcRenderer.invoke('documents:delete', payload),
     },
+    folder: {
+        openPicker: () => ipcRenderer.invoke('folder:open-picker'),
+        readDir: (dirPath) => ipcRenderer.invoke('folder:read-dir', dirPath),
+        readFile: (filePath) => ipcRenderer.invoke('folder:read-file', filePath),
+        writeFile: (filePath, content) =>
+            ipcRenderer.invoke('folder:write-file', filePath, content),
+    },
     ui: {
         getSidebarState: () => ipcRenderer.invoke('ui:get-sidebar-state'),
         setSidebarState: (payload) => ipcRenderer.invoke('ui:set-sidebar-state', payload),

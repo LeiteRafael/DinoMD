@@ -6,7 +6,196 @@ jest.mock('../../src/renderer/src/hooks/useDebounce.js', () => ({
     default: (value) => value,
 }))
 
+jest.mock('../../src/renderer/src/hooks/useFileTree.js', () => ({
+    __esModule: true,
+    default: jest.fn(),
+    ICON_FOLDER_CLOSED: '▶',
+    ICON_FOLDER_OPEN: '▼',
+    ICON_MD: '📝',
+    ICON_FILE: '📄',
+}))
+
 import Sidebar from '../../src/renderer/src/components/Sidebar/index.jsx'
+const useFileTree = require('../../src/renderer/src/hooks/useFileTree.js').default
+
+const ROOT = '/home/user/notes'
+
+function makeTreeState(overrides = {}) {
+    return {
+        rootFolderPath: null,
+        rootEntries: [],
+        expandedPaths: new Set(),
+        loading: false,
+        error: null,
+        openFolder: jest.fn(),
+        toggleFolder: jest.fn(),
+        ...overrides,
+    }
+}
+
+describe('Sidebar — empty state', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        useFileTree.mockReturnValue(makeTreeState())
+    })
+
+    test('shows no-folder message when rootFolderPath is null', () => {
+        render(<Sidebar rootFolderPath={null} />)
+
+        expect(screen.getByText(/no folder open/i)).toBeInTheDocument()
+    })
+
+    test('shows Open Folder button when rootFolderPath is null', () => {
+        render(<Sidebar rootFolderPath={null} />)
+
+        expect(screen.getByText('Open Folder')).toBeInTheDocument()
+    })
+
+    test('clicking Open Folder triggers openFolder from hook', () => {
+        const openFolder = jest.fn()
+        useFileTree.mockReturnValue(makeTreeState({ openFolder }))
+
+        render(<Sidebar rootFolderPath={null} />)
+        fireEvent.click(screen.getByText('Open Folder'))
+
+        expect(openFolder).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('Sidebar — loading state', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        useFileTree.mockReturnValue(makeTreeState({ rootFolderPath: ROOT, loading: true }))
+    })
+
+    test('shows loading indicator when loading is true', () => {
+        render(<Sidebar rootFolderPath={ROOT} />)
+
+        expect(screen.getByText(/loading/i)).toBeInTheDocument()
+    })
+})
+
+describe('Sidebar — error state', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        useFileTree.mockReturnValue(
+            makeTreeState({ rootFolderPath: ROOT, error: 'Permission denied' })
+        )
+    })
+
+    test('shows error message when error is set', () => {
+        render(<Sidebar rootFolderPath={ROOT} />)
+
+        expect(screen.getByText('Permission denied')).toBeInTheDocument()
+    })
+})
+
+describe('Sidebar — tree rendering', () => {
+    const folderNode = {
+        name: 'docs',
+        path: `${ROOT}/docs`,
+        type: 'folder',
+        extension: null,
+        depth: 0,
+        children: null,
+    }
+    const fileNode = {
+        name: 'readme.md',
+        path: `${ROOT}/readme.md`,
+        type: 'file',
+        extension: 'md',
+        depth: 0,
+        children: undefined,
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        useFileTree.mockReturnValue(
+            makeTreeState({
+                rootFolderPath: ROOT,
+                rootEntries: [folderNode, fileNode],
+            })
+        )
+    })
+
+    test('renders folder name in tree', () => {
+        render(<Sidebar rootFolderPath={ROOT} />)
+
+        expect(screen.getByText('docs')).toBeInTheDocument()
+    })
+
+    test('renders file name in tree', () => {
+        render(<Sidebar rootFolderPath={ROOT} />)
+
+        expect(screen.getByText('readme.md')).toBeInTheDocument()
+    })
+
+    test('active file row has active CSS class when activeFilePath matches', () => {
+        render(<Sidebar rootFolderPath={ROOT} activeFilePath={`${ROOT}/readme.md`} />)
+
+        const row = screen.getByTitle(`${ROOT}/readme.md`)
+        expect(row.className).toMatch(/treeRowActive/)
+    })
+
+    test('non-active file row does not have active CSS class', () => {
+        render(<Sidebar rootFolderPath={ROOT} activeFilePath={`${ROOT}/readme.md`} />)
+
+        const row = screen.getByTitle(`${ROOT}/docs`)
+        expect(row.className).not.toMatch(/treeRowActive/)
+    })
+
+    test('clicking a folder node calls toggleFolder', () => {
+        const toggleFolder = jest.fn()
+        useFileTree.mockReturnValue(
+            makeTreeState({
+                rootFolderPath: ROOT,
+                rootEntries: [folderNode],
+                toggleFolder,
+            })
+        )
+
+        render(<Sidebar rootFolderPath={ROOT} />)
+        fireEvent.click(screen.getByTitle(`${ROOT}/docs`))
+
+        expect(toggleFolder).toHaveBeenCalledWith(`${ROOT}/docs`, null)
+    })
+
+    test('clicking an md file node calls onOpenFile with its path', () => {
+        const onOpenFile = jest.fn()
+        useFileTree.mockReturnValue(
+            makeTreeState({
+                rootFolderPath: ROOT,
+                rootEntries: [fileNode],
+            })
+        )
+
+        render(<Sidebar rootFolderPath={ROOT} onOpenFile={onOpenFile} />)
+        fireEvent.click(screen.getByTitle(`${ROOT}/readme.md`))
+
+        expect(onOpenFile).toHaveBeenCalledWith(`${ROOT}/readme.md`)
+    })
+})
+
+describe('Sidebar — header', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        useFileTree.mockReturnValue(makeTreeState({ rootFolderPath: ROOT }))
+    })
+
+    test('shows folder basename in header when a folder is open', () => {
+        render(<Sidebar rootFolderPath={ROOT} />)
+
+        expect(screen.getByText('notes')).toBeInTheDocument()
+    })
+
+    test('shows Explorer in header when no folder is open', () => {
+        useFileTree.mockReturnValue(makeTreeState())
+
+        render(<Sidebar rootFolderPath={null} />)
+
+        expect(screen.getByText('Explorer')).toBeInTheDocument()
+    })
+})
 
 const sampleDocs = [
     { id: 'doc-1', name: 'Alpha Note', preview: 'First document preview text', mtimeMs: 1000 },

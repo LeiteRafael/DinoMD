@@ -1,5 +1,6 @@
 const documents = window.api?.documents ?? {}
 const uiApi = window.api?.ui ?? {}
+const folderApi = window.api?.folder ?? {}
 
 export const api = {
     importFiles: () =>
@@ -38,9 +39,20 @@ export const api = {
         Promise.resolve({ success: false, canForceDelete: false, error: 'API not available' }),
     onFileChangedExternally: (callback) => window.api?.onFileChangedExternally?.(callback),
     removeFileChangedListener: () => window.api?.removeFileChangedListener?.(),
+    folder: {
+        openPicker: () => folderApi.openPicker?.() ?? Promise.resolve(null),
+        readDir: (dirPath) => folderApi.readDir?.(dirPath) ?? Promise.resolve([]),
+        readFile: (filePath) =>
+            folderApi.readFile?.(filePath) ??
+            Promise.resolve({ success: false, error: 'API not available' }),
+        writeFile: (filePath, content) =>
+            folderApi.writeFile?.(filePath, content) ??
+            Promise.resolve({ success: false, error: 'API not available' }),
+    },
     ui: {
         getSidebarState: () =>
-            uiApi.getSidebarState?.() ?? Promise.resolve({ open: true, widthPercent: 22 }),
+            uiApi.getSidebarState?.() ??
+            Promise.resolve({ open: true, widthPercent: 22, rootFolderPath: null }),
         setSidebarState: (payload) =>
             uiApi.setSidebarState?.(payload) ??
             Promise.resolve({ success: false, error: 'API not available' }),

@@ -162,3 +162,111 @@
     text-overflow: ellipsis;
     margin-top: 2px;
 }
+
+/* ── Open-folder CTA button (empty state) ────────────────────────────────────── */
+
+.openFolderCta {
+    margin-top: 12px;
+    padding: 6px 14px;
+    background: #89b4fa;
+    color: #1e1e2e;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.openFolderCta:hover {
+    background: #b4d0fa;
+}
+
+/* ── Open-folder icon button (header) ────────────────────────────────────────── */
+
+.openFolderButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.openFolderButton:hover {
+    background: #313244;
+}
+
+/* ── Tree row ─────────────────────────────────────────────────────────────────── */
+
+.treeRow {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 15px;
+    color: #cdd6f4;
+    gap: 8px;
+    transition: background 0.1s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.treeRow:hover {
+    background: #313244;
+}
+
+.treeRowActive {
+    background: #45475a;
+    color: #89b4fa;
+}
+
+.treeRowActive:hover {
+    background: #585b70;
+}
+
+.treeRowUnsupported {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ── Icon & node name within a tree row ──────────────────────────────────────── */
+
+.icon {
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+    font-size: 18px !important;
+    line-height: 1;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.nodeName {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+/* ── Unsupported-file inline notice ─────────────────────────────────────────── */
+
+.unsupportedNotice {
+    font-size: 11px;
+    color: #f38ba8;
+    padding: 2px 8px 4px;
+    margin-left: 8px;
+    user-select: none;
+}

@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { registerDocumentHandlers, setMainWindow } from './ipc/documents.js'
 import { registerUiHandlers } from './ipc/ui.js'
+import { registerFolderHandlers } from './ipc/folder.js'
 function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
@@ -33,6 +34,7 @@ function createWindow() {
 app.whenReady().then(() => {
     registerDocumentHandlers()
     registerUiHandlers()
+    registerFolderHandlers()
     createWindow()
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow()

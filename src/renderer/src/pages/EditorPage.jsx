@@ -248,7 +248,7 @@ export default function EditorPage({
             {}
             <main className={styles.main}>
                 <MarkdownEditor
-                    key={session.documentId ?? 'draft'}
+                    key={session.documentId ?? session.filePath ?? 'draft'}
                     value={session.content}
                     onChange={updateContent}
                 />

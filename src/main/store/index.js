@@ -2,6 +2,7 @@ import Store from 'electron-store'
 const SIDEBAR_DEFAULTS = {
     open: true,
     widthPercent: 22,
+    rootFolderPath: null,
 }
 const schema = {
     documents: {
@@ -49,6 +50,10 @@ const schema = {
                     widthPercent: {
                         type: 'number',
                     },
+                    rootFolderPath: {
+                        type: ['string', 'null'],
+                        default: null,
+                    },
                 },
             },
         },
@@ -93,6 +98,10 @@ export function getSidebarState() {
             typeof stored.widthPercent === 'number'
                 ? stored.widthPercent
                 : SIDEBAR_DEFAULTS.widthPercent,
+        rootFolderPath:
+            typeof stored.rootFolderPath === 'string' || stored.rootFolderPath === null
+                ? stored.rootFolderPath
+                : SIDEBAR_DEFAULTS.rootFolderPath,
     }
 }
 export function setSidebarState(patch) {
@@ -103,6 +112,9 @@ export function setSidebarState(patch) {
     if (typeof patch.open === 'boolean') next.open = patch.open
     if (typeof patch.widthPercent === 'number') {
         next.widthPercent = Math.min(35, Math.max(15, patch.widthPercent))
+    }
+    if ('rootFolderPath' in patch) {
+        next.rootFolderPath = typeof patch.rootFolderPath === 'string' ? patch.rootFolderPath : null
     }
     store.set('ui.sidebar', next)
 }

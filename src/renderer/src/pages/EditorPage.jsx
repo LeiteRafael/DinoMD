@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import MarkdownEditor from '../components/MarkdownEditor/index.jsx'
 import ConfirmModal from '../components/ConfirmModal/index.jsx'
+import Toast from '../components/Toast/index.jsx'
 import { api } from '../services/api.js'
+import useToast from '../hooks/useToast.js'
+import { copyToClipboard, stripMarkdown } from '../utils/clipboardUtils.js'
 import styles from './EditorPage.module.css'
 export default function EditorPage({
     editorHook,
@@ -30,9 +33,24 @@ export default function EditorPage({
     const [externalChangeBanner, setExternalChangeBanner] = useState(false)
     const [bannerError, setBannerError] = useState(null)
     const titleRef = useRef(null)
+    const handleSaveRef = useRef(handleSave)
+    handleSaveRef.current = handleSave
+    const { toast, showToast, dismissToast } = useToast()
     useEffect(() => {
         setTitleValue(session.name)
     }, [session.name])
+    useEffect(() => {
+        function handleCtrlS(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault()
+                if (!session.isDraft && session.filePath) {
+                    handleSaveRef.current()
+                }
+            }
+        }
+        window.addEventListener('keydown', handleCtrlS)
+        return () => window.removeEventListener('keydown', handleCtrlS)
+    }, [session.isDraft, session.filePath])
     useEffect(() => {
         if (!session.documentId || session.isDraft) return
         api.onFileChangedExternally?.((data) => {
@@ -55,6 +73,30 @@ export default function EditorPage({
         }
         if (!result.saved && !result.canceled && error) {
             setBannerError(error)
+        }
+    }
+    async function handleCopyAsMarkdown() {
+        if (session.content.trim() === '') {
+            showToast({ message: 'Document is empty', type: 'info' })
+            return
+        }
+        try {
+            await copyToClipboard(session.content)
+            showToast({ message: 'Copied as Markdown', type: 'success' })
+        } catch (err) {
+            showToast({ message: `Could not copy: ${err.message}`, type: 'error' })
+        }
+    }
+    async function handleCopyAsPlainText() {
+        if (session.content.trim() === '') {
+            showToast({ message: 'Document is empty', type: 'info' })
+            return
+        }
+        try {
+            await copyToClipboard(stripMarkdown(session.content))
+            showToast({ message: 'Copied as Plain Text', type: 'success' })
+        } catch (err) {
+            showToast({ message: `Could not copy: ${err.message}`, type: 'error' })
         }
     }
     function requestNavigation(action) {
@@ -199,6 +241,20 @@ export default function EditorPage({
                             Split View
                         </button>
                     )}
+                    <button
+                        className={styles.copyBtn}
+                        onClick={handleCopyAsMarkdown}
+                        aria-label="Copy as Markdown"
+                    >
+                        Copy MD
+                    </button>
+                    <button
+                        className={styles.copyBtn}
+                        onClick={handleCopyAsPlainText}
+                        aria-label="Copy as Plain Text"
+                    >
+                        Copy Text
+                    </button>
                     {!session.isDraft && (
                         <button
                             className={styles.deleteBtn}
@@ -289,6 +345,7 @@ export default function EditorPage({
                     onCancel={() => setModal(null)}
                 />
             )}
+            <Toast toast={toast} onDismiss={dismissToast} />
         </div>
     )
 }

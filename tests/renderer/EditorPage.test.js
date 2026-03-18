@@ -11,6 +11,11 @@ jest.mock('../../src/renderer/src/services/api.js', () => ({
         removeFileChangedListener: jest.fn(),
     },
 }))
+jest.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
+    copyToClipboard: jest.fn(() => Promise.resolve()),
+    stripMarkdown: jest.fn((text) => text),
+}))
+import { copyToClipboard, stripMarkdown } from '../../src/renderer/src/utils/clipboardUtils.js'
 import EditorPage from '../../src/renderer/src/pages/EditorPage.jsx'
 function makeHook(overrides = {}) {
     const { session: sessionOverrides, ...hookOverrides } = overrides
@@ -487,5 +492,214 @@ describe('inline title rename', () => {
             })
         ).not.toBeInTheDocument()
         expect(screen.getByText('My Doc')).toBeInTheDocument()
+    })
+})
+describe('dirty state indicator', () => {
+    test('shows dirty dot (•) in the document title when isDirty is true', () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ isDirty: true })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        expect(screen.getByText(/My Doc.*•/)).toBeInTheDocument()
+    })
+
+    test('does not show dirty dot when isDirty is false', () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ isDirty: false })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        expect(screen.queryByText(/•/)).not.toBeInTheDocument()
+    })
+})
+describe('Ctrl+S shortcut', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('calls save when the document is on disk (filePath set, not a draft)', async () => {
+        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        render(
+            <EditorPage
+                editorHook={makeHook({ save })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.keyDown(window, { ctrlKey: true, key: 's' })
+
+        await waitFor(() => {
+            expect(save).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('does not call save for a draft document', async () => {
+        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        render(
+            <EditorPage
+                editorHook={makeHook({ save, session: { isDraft: true, filePath: null } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.keyDown(window, { ctrlKey: true, key: 's' })
+
+        await new Promise((r) => setTimeout(r, 0))
+        expect(save).not.toHaveBeenCalled()
+    })
+
+    test('does not call save when filePath is null', async () => {
+        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        render(
+            <EditorPage
+                editorHook={makeHook({ save, session: { isDraft: false, filePath: null } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.keyDown(window, { ctrlKey: true, key: 's' })
+
+        await new Promise((r) => setTimeout(r, 0))
+        expect(save).not.toHaveBeenCalled()
+    })
+})
+describe('copy actions', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('renders Copy MD and Copy Text buttons', () => {
+        render(
+            <EditorPage
+                editorHook={makeHook()}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        expect(screen.getByRole('button', { name: /copy as markdown/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /copy as plain text/i })).toBeInTheDocument()
+    })
+
+    test('clicking Copy MD calls copyToClipboard with the raw Markdown content', async () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as markdown/i }))
+
+        await waitFor(() => {
+            expect(copyToClipboard).toHaveBeenCalledWith('# Hello\n**world**')
+        })
+    })
+
+    test('clicking Copy MD shows a success toast', async () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '# Hello' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as markdown/i }))
+
+        await waitFor(() => {
+            expect(screen.getByText('Copied as Markdown')).toBeInTheDocument()
+        })
+    })
+
+    test('clicking Copy MD on an empty document shows an empty document notice', async () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as markdown/i }))
+
+        await waitFor(() => {
+            expect(screen.getByText('Document is empty')).toBeInTheDocument()
+        })
+        expect(copyToClipboard).not.toHaveBeenCalled()
+    })
+
+    test('clicking Copy Text calls copyToClipboard with the stripped content', async () => {
+        stripMarkdown.mockReturnValueOnce('Hello world')
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as plain text/i }))
+
+        await waitFor(() => {
+            expect(stripMarkdown).toHaveBeenCalledWith('# Hello\n**world**')
+            expect(copyToClipboard).toHaveBeenCalledWith('Hello world')
+        })
+    })
+
+    test('clicking Copy Text shows a success toast', async () => {
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '# Hello' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as plain text/i }))
+
+        await waitFor(() => {
+            expect(screen.getByText('Copied as Plain Text')).toBeInTheDocument()
+        })
+    })
+
+    test('shows error toast when copyToClipboard rejects', async () => {
+        copyToClipboard.mockRejectedValueOnce(new Error('Clipboard access denied'))
+        render(
+            <EditorPage
+                editorHook={makeHook({ session: { content: '# Hello' } })}
+                onBack={jest.fn()}
+                onDocumentSaved={jest.fn()}
+                onDocumentDeleted={jest.fn()}
+            />
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /copy as markdown/i }))
+
+        await waitFor(() => {
+            expect(screen.getByText(/Could not copy/)).toBeInTheDocument()
+        })
     })
 })

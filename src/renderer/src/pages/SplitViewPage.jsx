@@ -1,22 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import EditorPane from '../components/EditorPane/index.jsx'
 import PreviewPane from '../components/PreviewPane/index.jsx'
 import SplitDivider from '../components/SplitDivider/index.jsx'
 import ViewModeToggle from '../components/ViewModeToggle/index.jsx'
 import ConfirmModal from '../components/ConfirmModal/index.jsx'
+import Toast from '../components/Toast/index.jsx'
 import useDebounce from '../hooks/useDebounce.js'
 import useSplitView from '../hooks/useSplitView.js'
 import useSyncScroll from '../hooks/useSyncScroll.js'
+import useToast from '../hooks/useToast.js'
+import { copyToClipboard, stripMarkdown } from '../utils/clipboardUtils.js'
 import styles from './SplitViewPage.module.css'
 export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
     const { session, isDirty, saving, updateContent, save, discard } = editorHook
     const { viewMode, setViewMode } = useSplitView()
     const [syncEnabled, setSyncEnabled] = useState(true)
     const [modal, setModal] = useState(null)
+    const { toast, showToast, dismissToast } = useToast()
     const debouncedContent = useDebounce(session.content, 300)
     const { editorScrollRef, previewScrollRef, onEditorScroll, onPreviewScroll } = useSyncScroll({
         enabled: syncEnabled,
     })
+    const handleSaveRef = useRef(null)
+    handleSaveRef.current = handleSave
     useEffect(() => {
         const CYCLE = ['split', 'editor', 'preview']
         function handleKeyDown(e) {
@@ -26,11 +32,16 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
                     const idx = CYCLE.indexOf(prev)
                     return CYCLE[(idx + 1) % CYCLE.length]
                 })
+            } else if (e.ctrlKey && e.key === 's') {
+                e.preventDefault()
+                if (!session.isDraft && session.filePath) {
+                    handleSaveRef.current()
+                }
             }
         }
         window.addEventListener('keydown', handleKeyDown)
         return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [setViewMode])
+    }, [setViewMode, session.isDraft, session.filePath])
     async function handleSave() {
         const result = await save()
         if (result.saved && session.isDraft) {
@@ -39,6 +50,30 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
                 filePath: result.filePath,
                 name: result.name,
             })
+        }
+    }
+    async function handleCopyAsMarkdown() {
+        if (session.content.trim() === '') {
+            showToast({ message: 'Document is empty', type: 'info' })
+            return
+        }
+        try {
+            await copyToClipboard(session.content)
+            showToast({ message: 'Copied as Markdown', type: 'success' })
+        } catch (err) {
+            showToast({ message: `Could not copy: ${err.message}`, type: 'error' })
+        }
+    }
+    async function handleCopyAsPlainText() {
+        if (session.content.trim() === '') {
+            showToast({ message: 'Document is empty', type: 'info' })
+            return
+        }
+        try {
+            await copyToClipboard(stripMarkdown(session.content))
+            showToast({ message: 'Copied as Plain Text', type: 'success' })
+        } catch (err) {
+            showToast({ message: `Could not copy: ${err.message}`, type: 'error' })
         }
     }
     function requestNavigation(action) {
@@ -124,6 +159,22 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
                     </button>
 
                     <button
+                        className={styles.copyBtn}
+                        onClick={handleCopyAsMarkdown}
+                        aria-label="Copy as Markdown"
+                    >
+                        Copy MD
+                    </button>
+
+                    <button
+                        className={styles.copyBtn}
+                        onClick={handleCopyAsPlainText}
+                        aria-label="Copy as Plain Text"
+                    >
+                        Copy Text
+                    </button>
+
+                    <button
                         className={styles.saveBtn}
                         onClick={handleSave}
                         disabled={saving || (!isDirty && !session.isDraft)}
@@ -182,6 +233,7 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
                     onCancel={handleModalCancel}
                 />
             )}
+            <Toast toast={toast} onDismiss={dismissToast} />
         </div>
     )
 }

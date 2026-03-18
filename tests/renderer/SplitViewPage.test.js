@@ -306,11 +306,7 @@ describe('copy actions', () => {
 
     test('renders Copy MD and Copy Text buttons', () => {
         render(
-            <SplitViewPage
-                editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-            />
+            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
         )
 
         expect(screen.getByRole('button', { name: /copy as markdown/i })).toBeInTheDocument()

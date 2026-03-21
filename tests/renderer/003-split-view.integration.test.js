@@ -20,9 +20,7 @@ vi.mock('react-resizable-panels', () => ({
             {children}
         </div>
     ),
-    PanelResizeHandle: ({ className }) => (
-        <div data-testid="resize-handle" className={className} />
-    ),
+    PanelResizeHandle: ({ className }) => <div data-testid="resize-handle" className={className} />,
 }))
 vi.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
     copyToClipboard: vi.fn(() => Promise.resolve()),
@@ -64,9 +62,7 @@ describe('SplitViewPage + EditorPane + PreviewPane integration', () => {
     test('renders both the editor textarea and the preview panel group', () => {
         render(<SplitWrapper initialContent="# Hello" />)
 
-        expect(
-            screen.getByRole('textbox', { name: /markdown editor/i })
-        ).toBeInTheDocument()
+        expect(screen.getByRole('textbox', { name: /markdown editor/i })).toBeInTheDocument()
         expect(screen.getByTestId('panel-group')).toBeInTheDocument()
     })
 

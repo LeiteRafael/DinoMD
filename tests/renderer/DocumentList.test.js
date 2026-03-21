@@ -60,15 +60,20 @@ const docs = [
 ]
 describe('DocumentList', () => {
     beforeEach(() => {
+        vi.clearAllMocks()
         delete global.__dndOnDragEnd
     })
+
     test('renders all document names', () => {
         render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={vi.fn()} />)
+
         expect(screen.getByText('Alpha')).toBeInTheDocument()
         expect(screen.getByText('Beta')).toBeInTheDocument()
     })
+
     test('calls onReorder with new id order when drag ends', () => {
         const onReorder = vi.fn()
+
         render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={onReorder} />)
         const dragEndEvent = {
             active: {
@@ -79,10 +84,13 @@ describe('DocumentList', () => {
             },
         }
         global.__dndOnDragEnd(dragEndEvent)
+
         expect(onReorder).toHaveBeenCalledWith(['b', 'a'])
     })
+
     test('does NOT call onReorder when dropped on same item', () => {
         const onReorder = vi.fn()
+
         render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={onReorder} />)
         global.__dndOnDragEnd({
             active: {
@@ -92,6 +100,7 @@ describe('DocumentList', () => {
                 id: 'a',
             },
         })
+
         expect(onReorder).not.toHaveBeenCalled()
     })
 })

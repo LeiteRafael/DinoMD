@@ -35,7 +35,9 @@ describe('documents:import-files', () => {
         store.getDocuments.mockReturnValue([])
         store.findDocumentByPath.mockReturnValue(null)
         fileUtils.fileExists.mockResolvedValue(true)
+
         const result = await invokeHandler('documents:import-files')
+
         expect(result.success).toBe(true)
         expect(result.imported).toHaveLength(1)
         expect(result.imported[0].name).toBe('readme')
@@ -44,6 +46,7 @@ describe('documents:import-files', () => {
         expect(result.skipped).toHaveLength(0)
         expect(store.setDocuments).toHaveBeenCalledTimes(1)
     })
+
     test('skips duplicate file (same path already imported)', async () => {
         dialog.showOpenDialog.mockResolvedValue({
             canceled: false,
@@ -53,21 +56,27 @@ describe('documents:import-files', () => {
             id: 'existing-id',
             filePath: '/home/user/notes/readme.md',
         })
+
         const result = await invokeHandler('documents:import-files')
+
         expect(result.success).toBe(true)
         expect(result.imported).toHaveLength(0)
         expect(result.skipped).toHaveLength(1)
         expect(result.skipped[0].reason).toBe('duplicate')
     })
+
     test('skips non-.md file with reason "invalid-type"', async () => {
         dialog.showOpenDialog.mockResolvedValue({
             canceled: false,
             filePaths: ['/home/user/notes/image.png'],
         })
+
         const result = await invokeHandler('documents:import-files')
+
         expect(result.skipped[0].reason).toBe('invalid-type')
         expect(result.imported).toHaveLength(0)
     })
+
     test('skips unreadable file with reason "unreadable"', async () => {
         dialog.showOpenDialog.mockResolvedValue({
             canceled: false,
@@ -75,15 +84,20 @@ describe('documents:import-files', () => {
         })
         store.findDocumentByPath.mockReturnValue(null)
         fileUtils.fileExists.mockResolvedValue(false)
+
         const result = await invokeHandler('documents:import-files')
+
         expect(result.skipped[0].reason).toBe('unreadable')
     })
+
     test('returns empty imported[] when dialog is cancelled', async () => {
         dialog.showOpenDialog.mockResolvedValue({
             canceled: true,
             filePaths: [],
         })
+
         const result = await invokeHandler('documents:import-files')
+
         expect(result.success).toBe(true)
         expect(result.imported).toHaveLength(0)
         expect(store.setDocuments).not.toHaveBeenCalled()
@@ -108,7 +122,9 @@ describe('documents:get-all', () => {
             },
         ])
         fileUtils.fileExists.mockImplementation((p) => Promise.resolve(p === '/a.md'))
+
         const result = await invokeHandler('documents:get-all')
+
         expect(result.success).toBe(true)
         expect(result.documents[0].id).toBe('1')
         expect(result.documents[0].status).toBe('available')
@@ -135,9 +151,11 @@ describe('documents:reorder', () => {
             },
         ]
         store.getDocuments.mockReturnValue(docs)
+
         const result = await invokeHandler('documents:reorder', {
             orderedIds: ['b', 'a'],
         })
+
         expect(result.success).toBe(true)
         const saved = store.setDocuments.mock.calls[0][0]
         expect(saved[0].id).toBe('b')
@@ -145,6 +163,7 @@ describe('documents:reorder', () => {
         expect(saved[1].id).toBe('a')
         expect(saved[1].orderIndex).toBe(1)
     })
+
     test('returns error when orderedIds contains an unknown id', async () => {
         store.getDocuments.mockReturnValue([
             {
@@ -155,9 +174,11 @@ describe('documents:reorder', () => {
                 importedAt: '',
             },
         ])
+
         const result = await invokeHandler('documents:reorder', {
             orderedIds: ['a', 'unknown-id'],
         })
+
         expect(result.success).toBe(false)
         expect(result.error).toBeDefined()
     })
@@ -169,30 +190,38 @@ describe('documents:read-content', () => {
             filePath: '/readme.md',
         })
         fileUtils.readFileAsUtf8.mockResolvedValue('# My Readme\nHello world')
+
         const result = await invokeHandler('documents:read-content', {
             id: 'doc1',
         })
+
         expect(result.success).toBe(true)
         expect(result.content).toBe('# My Readme\nHello world')
     })
+
     test('returns error when document id is not found', async () => {
         store.findDocumentById.mockReturnValue(null)
+
         const result = await invokeHandler('documents:read-content', {
             id: 'nonexistent',
         })
+
         expect(result.success).toBe(false)
         expect(result.content).toBeNull()
         expect(result.error).toBeDefined()
     })
+
     test('returns error when file cannot be read', async () => {
         store.findDocumentById.mockReturnValue({
             id: 'doc1',
             filePath: '/missing.md',
         })
         fileUtils.readFileAsUtf8.mockRejectedValue(new Error('ENOENT: no such file'))
+
         const result = await invokeHandler('documents:read-content', {
             id: 'doc1',
         })
+
         expect(result.success).toBe(false)
         expect(result.content).toBeNull()
     })

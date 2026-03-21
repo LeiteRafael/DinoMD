@@ -40,12 +40,15 @@ beforeEach(() => {
 describe('ui:get-sidebar-state', () => {
     test('returns defaults when store is empty', async () => {
         const result = await invokeHandler('ui:get-sidebar-state')
+
         expect(result).toEqual({ open: true, widthPercent: 22 })
     })
 
     test('returns persisted value after a set call', async () => {
         store.getSidebarState.mockReturnValueOnce({ open: false, widthPercent: 28 })
+
         const result = await invokeHandler('ui:get-sidebar-state')
+
         expect(result.open).toBe(false)
         expect(result.widthPercent).toBe(28)
     })
@@ -54,33 +57,39 @@ describe('ui:get-sidebar-state', () => {
 describe('ui:set-sidebar-state', () => {
     test('returns { success: true } for valid open boolean', async () => {
         const result = await invokeHandler('ui:set-sidebar-state', { open: false })
+
         expect(result).toEqual({ success: true })
         expect(store.setSidebarState).toHaveBeenCalledWith({ open: false })
     })
 
     test('returns { success: true } for valid widthPercent number', async () => {
         const result = await invokeHandler('ui:set-sidebar-state', { widthPercent: 25 })
+
         expect(result).toEqual({ success: true })
         expect(store.setSidebarState).toHaveBeenCalledWith({ widthPercent: 25 })
     })
 
     test('clamps widthPercent to [15, 35] via setSidebarState', async () => {
         await invokeHandler('ui:set-sidebar-state', { widthPercent: 5 })
+
         expect(store.setSidebarState).toHaveBeenCalledWith({ widthPercent: 5 })
     })
 
     test('returns { success: false, error: "invalid-payload" } for non-boolean open', async () => {
         const result = await invokeHandler('ui:set-sidebar-state', { open: 'yes' })
+
         expect(result).toEqual({ success: false, error: 'invalid-payload' })
     })
 
     test('returns { success: false, error: "invalid-payload" } for non-number widthPercent', async () => {
         const result = await invokeHandler('ui:set-sidebar-state', { widthPercent: '25' })
+
         expect(result).toEqual({ success: false, error: 'invalid-payload' })
     })
 
     test('returns { success: false, error: "invalid-payload" } for null payload', async () => {
         const result = await invokeHandler('ui:set-sidebar-state', null)
+
         expect(result).toEqual({ success: false, error: 'invalid-payload' })
     })
 })

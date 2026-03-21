@@ -25,4 +25,12 @@ module.exports = {
         'no-comments': 'error',
         'no-empty': ['error', { allowEmptyCatch: true }],
     },
+    overrides: [
+        {
+            files: ['tests/**/*.{js,jsx}'],
+            globals: {
+                vi: 'readonly',
+            },
+        },
+    ],
 }

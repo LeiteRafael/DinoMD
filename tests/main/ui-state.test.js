@@ -1,14 +1,14 @@
-const { invokeHandler, resetMocks } = require('../../tests/__mocks__/electron.js')
+import { invokeHandler, resetMocks } from '../../tests/__mocks__/electron.js'
 
-jest.mock('../../src/main/store/index.js', () => {
+vi.mock('../../src/main/store/index.js', () => {
     let _state = null
 
     return {
-        getSidebarState: jest.fn(() => {
+        getSidebarState: vi.fn(() => {
             if (!_state) return { open: true, widthPercent: 22 }
             return { ..._state }
         }),
-        setSidebarState: jest.fn((patch) => {
+        setSidebarState: vi.fn((patch) => {
             const current = _state ?? { open: true, widthPercent: 22 }
             const next = { ...current }
             if (typeof patch.open === 'boolean') next.open = patch.open
@@ -23,8 +23,8 @@ jest.mock('../../src/main/store/index.js', () => {
     }
 })
 
-const store = require('../../src/main/store/index.js')
-const { registerUiHandlers } = require('../../src/main/ipc/ui.js')
+import * as store from '../../src/main/store/index.js'
+import { registerUiHandlers } from '../../src/main/ipc/ui.js'
 
 beforeAll(() => {
     registerUiHandlers()
@@ -32,7 +32,7 @@ beforeAll(() => {
 
 beforeEach(() => {
     resetMocks()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     store.__resetState()
     registerUiHandlers()
 })

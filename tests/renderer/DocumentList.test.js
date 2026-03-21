@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
-jest.mock('@dnd-kit/core', () => ({
+vi.mock('@dnd-kit/core', () => ({
     DndContext: ({ children, onDragEnd }) => {
         if (typeof global.__dndOnDragEnd === 'undefined') {
             global.__dndOnDragEnd = onDragEnd
@@ -9,39 +9,39 @@ jest.mock('@dnd-kit/core', () => ({
         }
         return <div data-testid="dnd-context">{children}</div>
     },
-    closestCenter: jest.fn(),
-    KeyboardSensor: jest.fn(),
-    PointerSensor: jest.fn(),
-    useSensor: jest.fn(() => ({})),
-    useSensors: jest.fn(() => []),
+    closestCenter: vi.fn(),
+    KeyboardSensor: vi.fn(),
+    PointerSensor: vi.fn(),
+    useSensor: vi.fn(() => ({})),
+    useSensors: vi.fn(() => []),
 }))
-jest.mock('@dnd-kit/sortable', () => ({
+vi.mock('@dnd-kit/sortable', () => ({
     SortableContext: ({ children }) => <div>{children}</div>,
-    sortableKeyboardCoordinates: jest.fn(),
-    verticalListSortingStrategy: jest.fn(),
-    arrayMove: jest.fn((arr, from, to) => {
+    sortableKeyboardCoordinates: vi.fn(),
+    verticalListSortingStrategy: vi.fn(),
+    arrayMove: vi.fn((arr, from, to) => {
         const next = [...arr]
         const [moved] = next.splice(from, 1)
         next.splice(to, 0, moved)
         return next
     }),
-    useSortable: jest.fn(() => ({
+    useSortable: vi.fn(() => ({
         attributes: {},
         listeners: {},
-        setNodeRef: jest.fn(),
+        setNodeRef: vi.fn(),
         transform: null,
         transition: null,
         isDragging: false,
     })),
 }))
-jest.mock('@dnd-kit/utilities', () => ({
+vi.mock('@dnd-kit/utilities', () => ({
     CSS: {
         Transform: {
-            toString: jest.fn(() => ''),
+            toString: vi.fn(() => ''),
         },
     },
 }))
-const DocumentList = require('../../src/renderer/src/components/DocumentList/index.jsx').default
+import DocumentList from '../../src/renderer/src/components/DocumentList/index.jsx'
 const docs = [
     {
         id: 'a',
@@ -63,13 +63,13 @@ describe('DocumentList', () => {
         delete global.__dndOnDragEnd
     })
     test('renders all document names', () => {
-        render(<DocumentList documents={docs} onOpen={jest.fn()} onReorder={jest.fn()} />)
+        render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={vi.fn()} />)
         expect(screen.getByText('Alpha')).toBeInTheDocument()
         expect(screen.getByText('Beta')).toBeInTheDocument()
     })
     test('calls onReorder with new id order when drag ends', () => {
-        const onReorder = jest.fn()
-        render(<DocumentList documents={docs} onOpen={jest.fn()} onReorder={onReorder} />)
+        const onReorder = vi.fn()
+        render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={onReorder} />)
         const dragEndEvent = {
             active: {
                 id: 'b',
@@ -82,8 +82,8 @@ describe('DocumentList', () => {
         expect(onReorder).toHaveBeenCalledWith(['b', 'a'])
     })
     test('does NOT call onReorder when dropped on same item', () => {
-        const onReorder = jest.fn()
-        render(<DocumentList documents={docs} onOpen={jest.fn()} onReorder={onReorder} />)
+        const onReorder = vi.fn()
+        render(<DocumentList documents={docs} onOpen={vi.fn()} onReorder={onReorder} />)
         global.__dndOnDragEnd({
             active: {
                 id: 'a',

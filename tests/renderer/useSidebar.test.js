@@ -1,27 +1,26 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('../../src/renderer/src/hooks/useDebounce.js', () => ({
+vi.mock('../../src/renderer/src/hooks/useDebounce.js', () => ({
     __esModule: true,
     default: (value) => value,
 }))
 
-jest.mock('../../src/renderer/src/services/api.js', () => ({
+vi.mock('../../src/renderer/src/services/api.js', () => ({
     api: {
         ui: {
-            getSidebarState: jest.fn(),
-            setSidebarState: jest.fn(),
+            getSidebarState: vi.fn(),
+            setSidebarState: vi.fn(),
         },
     },
 }))
 
-const { api } = require('../../src/renderer/src/services/api.js')
-const useSidebarModule = require('../../src/renderer/src/hooks/useSidebar.js')
-const useSidebar = useSidebarModule.default
+import { api } from '../../src/renderer/src/services/api.js'
+import useSidebar from '../../src/renderer/src/hooks/useSidebar.js'
 
 describe('useSidebar', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         api.ui.getSidebarState.mockResolvedValue({ open: true, widthPercent: 22 })
         api.ui.setSidebarState.mockResolvedValue({ success: true })
     })

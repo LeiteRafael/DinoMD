@@ -1,8 +1,9 @@
 import { render, screen, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('react-markdown', () => {
-    return function ReactMarkdownMock({ children, components }) {
+vi.mock('react-markdown', () => {
+    return {
+        default: function ReactMarkdownMock({ children, components }) {
         const lines = (children || '').split('\n')
         const elements = []
         let listItems = []
@@ -77,21 +78,22 @@ jest.mock('react-markdown', () => {
         })
         flushList()
         return <div data-testid="markdown-content">{elements}</div>
+        },
     }
 })
 
-jest.mock('remark-gfm', () => () => {})
-jest.mock('remark-frontmatter', () => () => {})
-jest.mock('rehype-slug', () => () => {})
+vi.mock('remark-gfm', () => ({ default: () => {} }))
+vi.mock('remark-frontmatter', () => ({ default: () => {} }))
+vi.mock('rehype-slug', () => ({ default: () => {} }))
 
-jest.mock('shiki', () => ({
-    codeToHtml: jest.fn((code, { lang }) =>
+vi.mock('shiki', () => ({
+    codeToHtml: vi.fn((code, { lang }) =>
         Promise.resolve(`<pre data-language="${lang}"><code>${code}</code></pre>`)
     ),
 }))
 
-const MarkdownViewer = require('../../src/renderer/src/components/MarkdownViewer/index.jsx').default
-const { codeToHtml } = require('shiki')
+import MarkdownViewer from '../../src/renderer/src/components/MarkdownViewer/index.jsx'
+import { codeToHtml } from 'shiki'
 
 const sampleMarkdown = `# Hello World
 
@@ -106,7 +108,7 @@ console.log('hello')
 
 describe('MarkdownViewer', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
     test('renders an H1 from a markdown heading', async () => {
         await act(async () => {

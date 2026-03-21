@@ -70,7 +70,7 @@ describe('stripMarkdown', () => {
 describe('copyToClipboard', () => {
     beforeEach(() => {
         Object.assign(navigator, {
-            clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+            clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
         })
     })
 

@@ -1,12 +1,12 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-const useDebounce = require('../../src/renderer/src/hooks/useDebounce.js').default
+import useDebounce from '../../src/renderer/src/hooks/useDebounce.js'
 describe('useDebounce', () => {
     beforeEach(() => {
-        jest.useFakeTimers()
+        vi.useFakeTimers()
     })
     afterEach(() => {
-        jest.useRealTimers()
+        vi.useRealTimers()
     })
     test('returns the initial value immediately', () => {
         const { result } = renderHook(() => useDebounce('hello', 300))
@@ -24,7 +24,7 @@ describe('useDebounce', () => {
             delay: 300,
         })
         act(() => {
-            jest.advanceTimersByTime(200)
+            vi.advanceTimersByTime(200)
         })
         expect(result.current).toBe('initial')
     })
@@ -40,7 +40,7 @@ describe('useDebounce', () => {
             delay: 300,
         })
         act(() => {
-            jest.advanceTimersByTime(300)
+            vi.advanceTimersByTime(300)
         })
         expect(result.current).toBe('updated')
     })
@@ -56,18 +56,18 @@ describe('useDebounce', () => {
             delay: 300,
         })
         act(() => {
-            jest.advanceTimersByTime(100)
+            vi.advanceTimersByTime(100)
         })
         rerender({
             value: 'v3',
             delay: 300,
         })
         act(() => {
-            jest.advanceTimersByTime(100)
+            vi.advanceTimersByTime(100)
         })
         expect(result.current).toBe('v1')
         act(() => {
-            jest.advanceTimersByTime(200)
+            vi.advanceTimersByTime(200)
         })
         expect(result.current).toBe('v3')
     })

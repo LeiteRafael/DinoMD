@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-const useSyncScroll = require('../../src/renderer/src/hooks/useSyncScroll.js').default
+import useSyncScroll from '../../src/renderer/src/hooks/useSyncScroll.js'
 function makeMockEl(scrollTop = 0, scrollHeight = 1000, clientHeight = 200) {
     return {
         scrollTop,

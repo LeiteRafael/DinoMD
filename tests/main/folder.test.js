@@ -1,17 +1,17 @@
-const { invokeHandler, dialog, resetMocks } = require('../../tests/__mocks__/electron.js')
+import { invokeHandler, dialog, resetMocks } from '../../tests/__mocks__/electron.js'
 
-jest.mock('../../src/main/fs/fileUtils.js', () => ({
-    readDirFiltered: jest.fn(),
-    readFileAsUtf8: jest.fn(),
-    fileExists: jest.fn(),
-    writeFileUtf8: jest.fn(),
-    renameFile: jest.fn(),
-    watchFile: jest.fn(),
-    stopWatching: jest.fn(),
+vi.mock('../../src/main/fs/fileUtils.js', () => ({
+    readDirFiltered: vi.fn(),
+    readFileAsUtf8: vi.fn(),
+    fileExists: vi.fn(),
+    writeFileUtf8: vi.fn(),
+    renameFile: vi.fn(),
+    watchFile: vi.fn(),
+    stopWatching: vi.fn(),
 }))
 
-const fileUtils = require('../../src/main/fs/fileUtils.js')
-const { registerFolderHandlers } = require('../../src/main/ipc/folder.js')
+import * as fileUtils from '../../src/main/fs/fileUtils.js'
+import { registerFolderHandlers } from '../../src/main/ipc/folder.js'
 
 beforeAll(() => {
     registerFolderHandlers()
@@ -19,7 +19,7 @@ beforeAll(() => {
 
 beforeEach(() => {
     resetMocks()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     registerFolderHandlers()
 })
 

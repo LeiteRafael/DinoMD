@@ -1,19 +1,18 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('../../src/renderer/src/services/api.js', () => ({
+vi.mock('../../src/renderer/src/services/api.js', () => ({
     api: {
         folder: {
-            openPicker: jest.fn(),
-            readDir: jest.fn(),
-            readFile: jest.fn(),
+            openPicker: vi.fn(),
+            readDir: vi.fn(),
+            readFile: vi.fn(),
         },
     },
 }))
 
-const { api } = require('../../src/renderer/src/services/api.js')
-const useFileTreeModule = require('../../src/renderer/src/hooks/useFileTree.js')
-const useFileTree = useFileTreeModule.default
+import { api } from '../../src/renderer/src/services/api.js'
+import useFileTree from '../../src/renderer/src/hooks/useFileTree.js'
 
 const ROOT = '/home/user/notes'
 const ROOT_ENTRIES = [
@@ -24,7 +23,7 @@ const DOCS_ENTRIES = [{ name: 'guide.md', isDirectory: false, path: `${ROOT}/doc
 
 describe('useFileTree — openFolder', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         api.folder.openPicker.mockResolvedValue(null)
         api.folder.readDir.mockResolvedValue([])
     })
@@ -67,7 +66,7 @@ describe('useFileTree — openFolder', () => {
     test('openFolder calls onRootFolderChange callback with chosen path', async () => {
         api.folder.openPicker.mockResolvedValue(ROOT)
         api.folder.readDir.mockResolvedValue(ROOT_ENTRIES)
-        const onRootFolderChange = jest.fn()
+        const onRootFolderChange = vi.fn()
 
         const { result } = renderHook(() => useFileTree({ onRootFolderChange }))
 
@@ -81,7 +80,7 @@ describe('useFileTree — openFolder', () => {
 
 describe('useFileTree — initial root loading', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         api.folder.readDir.mockResolvedValue(ROOT_ENTRIES)
     })
 
@@ -129,7 +128,7 @@ describe('useFileTree — initial root loading', () => {
 
 describe('useFileTree — toggleFolder', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         api.folder.readDir.mockResolvedValue(ROOT_ENTRIES)
     })
 

@@ -1,17 +1,17 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-jest.mock('react-markdown', () => {
-    return function ReactMarkdownMock({ children }) {
+vi.mock('react-markdown', () => ({
+    default: function ReactMarkdownMock({ children }) {
         return <div data-testid="markdown-content">{children}</div>
-    }
-})
-jest.mock('remark-gfm', () => () => {})
-jest.mock('remark-frontmatter', () => () => {})
-jest.mock('rehype-slug', () => () => {})
-jest.mock('shiki', () => ({
-    codeToHtml: jest.fn(() => Promise.resolve('<pre><code>code</code></pre>')),
+    },
 }))
-jest.mock('react-resizable-panels', () => ({
+vi.mock('remark-gfm', () => ({ default: () => {} }))
+vi.mock('remark-frontmatter', () => ({ default: () => {} }))
+vi.mock('rehype-slug', () => ({ default: () => {} }))
+vi.mock('shiki', () => ({
+    codeToHtml: vi.fn(() => Promise.resolve('<pre><code>code</code></pre>')),
+}))
+vi.mock('react-resizable-panels', () => ({
     PanelGroup: ({ children, className }) => (
         <div data-testid="panel-group" className={className}>
             {children}
@@ -24,9 +24,9 @@ jest.mock('react-resizable-panels', () => ({
     ),
     PanelResizeHandle: ({ className }) => <div data-testid="resize-handle" className={className} />,
 }))
-jest.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
-    copyToClipboard: jest.fn(() => Promise.resolve()),
-    stripMarkdown: jest.fn((text) => text),
+vi.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
+    copyToClipboard: vi.fn(() => Promise.resolve()),
+    stripMarkdown: vi.fn((text) => text),
 }))
 import { copyToClipboard, stripMarkdown } from '../../src/renderer/src/utils/clipboardUtils.js'
 import SplitViewPage from '../../src/renderer/src/pages/SplitViewPage.jsx'
@@ -46,21 +46,21 @@ function makeHook(overrides = {}) {
         isDirty: false,
         saving: false,
         error: null,
-        updateContent: jest.fn(),
-        save: jest.fn(() =>
+        updateContent: vi.fn(),
+        save: vi.fn(() =>
             Promise.resolve({
                 saved: true,
                 canceled: false,
             })
         ),
-        discard: jest.fn(),
+        discard: vi.fn(),
         ...hookOverrides,
     }
 }
 describe('SplitViewPage rendering', () => {
     test('renders in split mode with both panes present', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         expect(
             screen.getByRole('textbox', {
@@ -71,7 +71,7 @@ describe('SplitViewPage rendering', () => {
     })
     test('displays the document name in the header', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         expect(screen.getByText(/Test Doc/)).toBeInTheDocument()
     })
@@ -84,8 +84,8 @@ describe('SplitViewPage rendering', () => {
                         savedContent: '',
                     },
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
         expect(screen.getByText(/Nothing to preview yet/i)).toBeInTheDocument()
@@ -94,7 +94,7 @@ describe('SplitViewPage rendering', () => {
 describe('ViewModeToggle', () => {
     test('clicking Editor Only hides the preview pane panel-group', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         fireEvent.click(
             screen.getByRole('button', {
@@ -110,7 +110,7 @@ describe('ViewModeToggle', () => {
     })
     test('clicking Preview Only hides the editor textarea (via display:none)', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         fireEvent.click(
             screen.getByRole('button', {
@@ -127,7 +127,7 @@ describe('ViewModeToggle', () => {
     })
     test('toggling back to Split restores both panes', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         fireEvent.click(
             screen.getByRole('button', {
@@ -153,7 +153,7 @@ describe('ViewModeToggle', () => {
                 savedContent: '# My Content',
             },
         })
-        render(<SplitViewPage editorHook={hook} onBack={jest.fn()} onDocumentSaved={jest.fn()} />)
+        render(<SplitViewPage editorHook={hook} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
         fireEvent.click(
             screen.getByRole('button', {
                 name: /editor only/i,
@@ -178,14 +178,14 @@ describe('ViewModeToggle', () => {
 })
 describe('Navigation guard', () => {
     test('shows unsaved changes modal when navigating back with dirty content', () => {
-        const onBack = jest.fn()
+        const onBack = vi.fn()
         render(
             <SplitViewPage
                 editorHook={makeHook({
                     isDirty: true,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
         fireEvent.click(
@@ -201,14 +201,14 @@ describe('Navigation guard', () => {
         expect(onBack).not.toHaveBeenCalled()
     })
     test('calls onBack directly when content is not dirty', () => {
-        const onBack = jest.fn()
+        const onBack = vi.fn()
         render(
             <SplitViewPage
                 editorHook={makeHook({
                     isDirty: false,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
         fireEvent.click(
@@ -222,13 +222,13 @@ describe('Navigation guard', () => {
 describe('Sync Scroll toggle', () => {
     test('renders the sync scroll button', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         expect(screen.getByTitle(/synchronized scrolling/i)).toBeInTheDocument()
     })
     test('sync button toggles aria-pressed state', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         const btn = screen.getByTitle(/synchronized scrolling/i)
         expect(btn).toHaveAttribute('aria-pressed', 'true')
@@ -239,7 +239,7 @@ describe('Sync Scroll toggle', () => {
 describe('Layout', () => {
     test('outer container has the minWidth CSS class applied', () => {
         const { container } = render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
         const outerDiv = container.firstChild
         expect(outerDiv.className).toContain('minWidth')
@@ -247,16 +247,16 @@ describe('Layout', () => {
 })
 describe('Ctrl+S shortcut', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     test('calls save when the document is on disk (filePath set, not a draft)', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <SplitViewPage
                 editorHook={makeHook({ save })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -268,12 +268,12 @@ describe('Ctrl+S shortcut', () => {
     })
 
     test('does not call save for a draft document', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <SplitViewPage
                 editorHook={makeHook({ save, session: { isDraft: true, filePath: null } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -284,12 +284,12 @@ describe('Ctrl+S shortcut', () => {
     })
 
     test('does not call save when filePath is null', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <SplitViewPage
                 editorHook={makeHook({ save, session: { isDraft: false, filePath: null } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -301,12 +301,12 @@ describe('Ctrl+S shortcut', () => {
 })
 describe('copy actions', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     test('renders Copy MD and Copy Text buttons', () => {
         render(
-            <SplitViewPage editorHook={makeHook()} onBack={jest.fn()} onDocumentSaved={jest.fn()} />
+            <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
 
         expect(screen.getByRole('button', { name: /copy as markdown/i })).toBeInTheDocument()
@@ -317,8 +317,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -333,8 +333,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -349,8 +349,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -367,8 +367,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -384,8 +384,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 
@@ -401,8 +401,8 @@ describe('copy actions', () => {
         render(
             <SplitViewPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
             />
         )
 

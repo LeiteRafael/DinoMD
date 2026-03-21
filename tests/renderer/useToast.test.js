@@ -1,15 +1,14 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-
-const useToast = require('../../src/renderer/src/hooks/useToast.js').default
+import useToast from '../../src/renderer/src/hooks/useToast.js'
 
 describe('useToast', () => {
     beforeEach(() => {
-        jest.useFakeTimers()
+        vi.useFakeTimers()
     })
 
     afterEach(() => {
-        jest.useRealTimers()
+        vi.useRealTimers()
     })
 
     test('returns null toast initially', () => {
@@ -47,7 +46,7 @@ describe('useToast', () => {
         expect(result.current.toast).not.toBeNull()
 
         act(() => {
-            jest.advanceTimersByTime(2500)
+            vi.advanceTimersByTime(2500)
         })
 
         expect(result.current.toast).toBeNull()
@@ -61,7 +60,7 @@ describe('useToast', () => {
         })
 
         act(() => {
-            jest.advanceTimersByTime(2499)
+            vi.advanceTimersByTime(2499)
         })
 
         expect(result.current.toast).not.toBeNull()
@@ -102,19 +101,19 @@ describe('useToast', () => {
             result.current.showToast({ message: 'First', type: 'success' })
         })
         act(() => {
-            jest.advanceTimersByTime(2000)
+            vi.advanceTimersByTime(2000)
         })
         act(() => {
             result.current.showToast({ message: 'Second', type: 'error' })
         })
         act(() => {
-            jest.advanceTimersByTime(2000)
+            vi.advanceTimersByTime(2000)
         })
 
         expect(result.current.toast).not.toBeNull()
 
         act(() => {
-            jest.advanceTimersByTime(500)
+            vi.advanceTimersByTime(500)
         })
 
         expect(result.current.toast).toBeNull()

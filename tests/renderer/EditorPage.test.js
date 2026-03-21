@@ -1,19 +1,19 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-jest.mock('../../src/renderer/src/services/api.js', () => ({
+vi.mock('../../src/renderer/src/services/api.js', () => ({
     api: {
-        create: jest.fn(),
-        readContent: jest.fn(),
-        save: jest.fn(),
-        rename: jest.fn(),
-        delete: jest.fn(),
-        onFileChangedExternally: jest.fn(),
-        removeFileChangedListener: jest.fn(),
+        create: vi.fn(),
+        readContent: vi.fn(),
+        save: vi.fn(),
+        rename: vi.fn(),
+        delete: vi.fn(),
+        onFileChangedExternally: vi.fn(),
+        removeFileChangedListener: vi.fn(),
     },
 }))
-jest.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
-    copyToClipboard: jest.fn(() => Promise.resolve()),
-    stripMarkdown: jest.fn((text) => text),
+vi.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
+    copyToClipboard: vi.fn(() => Promise.resolve()),
+    stripMarkdown: vi.fn((text) => text),
 }))
 import { copyToClipboard, stripMarkdown } from '../../src/renderer/src/utils/clipboardUtils.js'
 import EditorPage from '../../src/renderer/src/pages/EditorPage.jsx'
@@ -33,29 +33,29 @@ function makeHook(overrides = {}) {
         isDirty: false,
         saving: false,
         error: null,
-        setError: jest.fn(),
-        updateContent: jest.fn(),
-        save: jest.fn(() =>
+        setError: vi.fn(),
+        updateContent: vi.fn(),
+        save: vi.fn(() =>
             Promise.resolve({
                 saved: true,
                 canceled: false,
             })
         ),
-        rename: jest.fn(() =>
+        rename: vi.fn(() =>
             Promise.resolve({
                 success: true,
                 newFilePath: '/notes/my-doc.md',
             })
         ),
-        discard: jest.fn(),
-        deleteDocument: jest.fn(() =>
+        discard: vi.fn(),
+        deleteDocument: vi.fn(() =>
             Promise.resolve({
                 success: true,
                 canForceDelete: false,
                 error: null,
             })
         ),
-        reloadContent: jest.fn(() => Promise.resolve()),
+        reloadContent: vi.fn(() => Promise.resolve()),
         ...hookOverrides,
     }
 }
@@ -64,9 +64,9 @@ describe('EditorPage rendering', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(screen.getByText('My Doc')).toBeInTheDocument()
@@ -75,9 +75,9 @@ describe('EditorPage rendering', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -94,9 +94,9 @@ describe('EditorPage rendering', () => {
                         isDraft: false,
                     },
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -113,9 +113,9 @@ describe('EditorPage rendering', () => {
                         isDraft: true,
                     },
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -133,9 +133,9 @@ describe('EditorPage rendering', () => {
                         isDraft: false,
                     },
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -150,9 +150,9 @@ describe('EditorPage rendering', () => {
                 editorHook={makeHook({
                     isDirty: true,
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -167,9 +167,9 @@ describe('EditorPage rendering', () => {
                 editorHook={makeHook({
                     saving: true,
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(screen.getByText(/saving/i)).toBeInTheDocument()
@@ -178,9 +178,9 @@ describe('EditorPage rendering', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         expect(
@@ -192,15 +192,15 @@ describe('EditorPage rendering', () => {
 })
 describe('navigation guard (unsaved changes)', () => {
     test('calls onBack immediately when not dirty', () => {
-        const onBack = jest.fn()
+        const onBack = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
                     isDirty: false,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -211,15 +211,15 @@ describe('navigation guard (unsaved changes)', () => {
         expect(onBack).toHaveBeenCalledTimes(1)
     })
     test('shows ConfirmModal (not onBack) when Back is clicked with unsaved changes', () => {
-        const onBack = jest.fn()
+        const onBack = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
                     isDirty: true,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -236,8 +236,8 @@ describe('navigation guard (unsaved changes)', () => {
         ).toBeInTheDocument()
     })
     test('closes modal and calls onBack when Discard is chosen', () => {
-        const onBack = jest.fn()
-        const discard = jest.fn()
+        const onBack = vi.fn()
+        const discard = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -245,8 +245,8 @@ describe('navigation guard (unsaved changes)', () => {
                     discard,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -265,15 +265,15 @@ describe('navigation guard (unsaved changes)', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
     test('closes modal without calling onBack when Cancel is chosen', () => {
-        const onBack = jest.fn()
+        const onBack = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
                     isDirty: true,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -291,8 +291,8 @@ describe('navigation guard (unsaved changes)', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
     test('saves and calls onBack when Save is chosen in the modal', async () => {
-        const onBack = jest.fn()
-        const save = jest.fn(() =>
+        const onBack = vi.fn()
+        const save = vi.fn(() =>
             Promise.resolve({
                 saved: true,
                 canceled: false,
@@ -305,8 +305,8 @@ describe('navigation guard (unsaved changes)', () => {
                     save,
                 })}
                 onBack={onBack}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -334,9 +334,9 @@ describe('delete flow', () => {
                         isDraft: false,
                     },
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -348,14 +348,14 @@ describe('delete flow', () => {
         expect(screen.getByText(/delete document/i)).toBeInTheDocument()
     })
     test('calls deleteDocument and onDocumentDeleted on confirmation', async () => {
-        const deleteDocument = jest.fn(() =>
+        const deleteDocument = vi.fn(() =>
             Promise.resolve({
                 success: true,
                 canForceDelete: false,
                 error: null,
             })
         )
-        const onDocumentDeleted = jest.fn()
+        const onDocumentDeleted = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -364,8 +364,8 @@ describe('delete flow', () => {
                     },
                     deleteDocument,
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
                 onDocumentDeleted={onDocumentDeleted}
             />
         )
@@ -385,7 +385,7 @@ describe('delete flow', () => {
         })
     })
     test('closes modal without deleting when Cancel is clicked', () => {
-        const deleteDocument = jest.fn()
+        const deleteDocument = vi.fn()
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -394,9 +394,9 @@ describe('delete flow', () => {
                     },
                     deleteDocument,
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -413,7 +413,7 @@ describe('delete flow', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
     test('shows force-delete modal when trashItem fails (canForceDelete=true)', async () => {
-        const deleteDocument = jest.fn(() =>
+        const deleteDocument = vi.fn(() =>
             Promise.resolve({
                 success: false,
                 canForceDelete: true,
@@ -428,9 +428,9 @@ describe('delete flow', () => {
                     },
                     deleteDocument,
                 })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(
@@ -453,9 +453,9 @@ describe('inline title rename', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(screen.getByText('My Doc'))
@@ -469,9 +469,9 @@ describe('inline title rename', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
         fireEvent.click(screen.getByText('My Doc'))
@@ -499,9 +499,9 @@ describe('dirty state indicator', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ isDirty: true })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -512,9 +512,9 @@ describe('dirty state indicator', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ isDirty: false })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -523,17 +523,17 @@ describe('dirty state indicator', () => {
 })
 describe('Ctrl+S shortcut', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     test('calls save when the document is on disk (filePath set, not a draft)', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <EditorPage
                 editorHook={makeHook({ save })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -545,13 +545,13 @@ describe('Ctrl+S shortcut', () => {
     })
 
     test('does not call save for a draft document', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <EditorPage
                 editorHook={makeHook({ save, session: { isDraft: true, filePath: null } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -562,13 +562,13 @@ describe('Ctrl+S shortcut', () => {
     })
 
     test('does not call save when filePath is null', async () => {
-        const save = jest.fn(() => Promise.resolve({ saved: true, canceled: false }))
+        const save = vi.fn(() => Promise.resolve({ saved: true, canceled: false }))
         render(
             <EditorPage
                 editorHook={makeHook({ save, session: { isDraft: false, filePath: null } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -580,16 +580,16 @@ describe('Ctrl+S shortcut', () => {
 })
 describe('copy actions', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
 
     test('renders Copy MD and Copy Text buttons', () => {
         render(
             <EditorPage
                 editorHook={makeHook()}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -601,9 +601,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -618,9 +618,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -635,9 +635,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -654,9 +654,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '# Hello\n**world**' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -672,9 +672,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 
@@ -690,9 +690,9 @@ describe('copy actions', () => {
         render(
             <EditorPage
                 editorHook={makeHook({ session: { content: '# Hello' } })}
-                onBack={jest.fn()}
-                onDocumentSaved={jest.fn()}
-                onDocumentDeleted={jest.fn()}
+                onBack={vi.fn()}
+                onDocumentSaved={vi.fn()}
+                onDocumentDeleted={vi.fn()}
             />
         )
 

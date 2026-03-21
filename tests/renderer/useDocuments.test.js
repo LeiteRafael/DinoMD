@@ -1,16 +1,15 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-jest.mock('../../src/renderer/src/services/api.js', () => ({
+vi.mock('../../src/renderer/src/services/api.js', () => ({
     api: {
-        getAll: jest.fn(),
-        importFiles: jest.fn(),
-        remove: jest.fn(),
-        reorder: jest.fn(),
+        getAll: vi.fn(),
+        importFiles: vi.fn(),
+        remove: vi.fn(),
+        reorder: vi.fn(),
     },
 }))
-const { api } = require('../../src/renderer/src/services/api.js')
-const useDocumentsModule = require('../../src/renderer/src/hooks/useDocuments.js')
-const useDocuments = useDocumentsModule.default
+import { api } from '../../src/renderer/src/services/api.js'
+import useDocuments from '../../src/renderer/src/hooks/useDocuments.js'
 const sampleDocs = [
     {
         id: '1',
@@ -29,7 +28,7 @@ const sampleDocs = [
 ]
 describe('useDocuments', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
     test('loads documents on mount', async () => {
         api.getAll.mockResolvedValue({

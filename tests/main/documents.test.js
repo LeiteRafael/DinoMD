@@ -1,29 +1,29 @@
-const { invokeHandler, dialog, resetMocks } = require('../../tests/__mocks__/electron.js')
-jest.mock('../../src/main/store/index.js', () => ({
-    getDocuments: jest.fn(() => []),
-    setDocuments: jest.fn(),
-    findDocumentById: jest.fn(() => null),
-    findDocumentByPath: jest.fn(() => null),
-    updateDocument: jest.fn(),
-    removeDocumentById: jest.fn(),
+import { invokeHandler, dialog, resetMocks } from '../../tests/__mocks__/electron.js'
+vi.mock('../../src/main/store/index.js', () => ({
+    getDocuments: vi.fn(() => []),
+    setDocuments: vi.fn(),
+    findDocumentById: vi.fn(() => null),
+    findDocumentByPath: vi.fn(() => null),
+    updateDocument: vi.fn(),
+    removeDocumentById: vi.fn(),
 }))
-jest.mock('../../src/main/fs/fileUtils.js', () => ({
-    fileExists: jest.fn(() => Promise.resolve(true)),
-    readFileAsUtf8: jest.fn(() => Promise.resolve('# Hello')),
-    writeFileUtf8: jest.fn(() => Promise.resolve()),
-    renameFile: jest.fn(() => Promise.resolve()),
-    watchFile: jest.fn(),
-    stopWatching: jest.fn(),
+vi.mock('../../src/main/fs/fileUtils.js', () => ({
+    fileExists: vi.fn(() => Promise.resolve(true)),
+    readFileAsUtf8: vi.fn(() => Promise.resolve('# Hello')),
+    writeFileUtf8: vi.fn(() => Promise.resolve()),
+    renameFile: vi.fn(() => Promise.resolve()),
+    watchFile: vi.fn(),
+    stopWatching: vi.fn(),
 }))
-const store = require('../../src/main/store/index.js')
-const fileUtils = require('../../src/main/fs/fileUtils.js')
-const { registerDocumentHandlers } = require('../../src/main/ipc/documents.js')
+import * as store from '../../src/main/store/index.js'
+import * as fileUtils from '../../src/main/fs/fileUtils.js'
+import { registerDocumentHandlers } from '../../src/main/ipc/documents.js'
 beforeAll(() => {
     registerDocumentHandlers()
 })
 beforeEach(() => {
     resetMocks()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     registerDocumentHandlers()
 })
 describe('documents:import-files', () => {

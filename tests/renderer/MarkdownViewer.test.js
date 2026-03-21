@@ -1,97 +1,101 @@
 import { render, screen, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('react-markdown', () => {
-    return function ReactMarkdownMock({ children, components }) {
-        const lines = (children || '').split('\n')
-        const elements = []
-        let listItems = []
-        let inCode = false
-        let codeLang = ''
-        let codeLines = []
+vi.mock('react-markdown', () => {
+    return {
+        default: function ReactMarkdownMock({ children, components }) {
+            const lines = (children || '').split('\n')
+            const elements = []
+            let listItems = []
+            let inCode = false
+            let codeLang = ''
+            let codeLines = []
 
-        const flushList = () => {
-            if (listItems.length) {
-                elements.push(
-                    <ul key={`ul-${elements.length}`}>
-                        {listItems.map((t, i) => (
-                            <li key={i}>{t}</li>
-                        ))}
-                    </ul>
-                )
-                listItems = []
+            const flushList = () => {
+                if (listItems.length) {
+                    elements.push(
+                        <ul key={`ul-${elements.length}`}>
+                            {listItems.map((t, i) => (
+                                <li key={i}>{t}</li>
+                            ))}
+                        </ul>
+                    )
+                    listItems = []
+                }
             }
-        }
 
-        lines.forEach((line, i) => {
-            if (line.startsWith('```')) {
-                if (!inCode) {
+            lines.forEach((line, i) => {
+                if (line.startsWith('```')) {
+                    if (!inCode) {
+                        flushList()
+                        inCode = true
+                        codeLang = line.slice(3).trim() || 'text'
+                        codeLines = []
+                    } else {
+                        const codeStr = codeLines.join('\n') + '\n'
+                        const CodeComponent = components?.code
+                        if (CodeComponent) {
+                            elements.push(
+                                <CodeComponent key={`code-${i}`} className={`language-${codeLang}`}>
+                                    {codeStr}
+                                </CodeComponent>
+                            )
+                        } else {
+                            elements.push(
+                                <pre key={`code-${i}`}>
+                                    <code className={`language-${codeLang}`}>{codeStr}</code>
+                                </pre>
+                            )
+                        }
+                        inCode = false
+                        codeLang = ''
+                        codeLines = []
+                    }
+                } else if (inCode) {
+                    codeLines.push(line)
+                } else if (line.startsWith('# ')) {
                     flushList()
-                    inCode = true
-                    codeLang = line.slice(3).trim() || 'text'
-                    codeLines = []
-                } else {
-                    const codeStr = codeLines.join('\n') + '\n'
-                    const CodeComponent = components?.code
-                    if (CodeComponent) {
+                    elements.push(<h1 key={i}>{line.slice(2)}</h1>)
+                } else if (line.startsWith('## ')) {
+                    flushList()
+                    elements.push(<h2 key={i}>{line.slice(3)}</h2>)
+                } else if (line.startsWith('- ')) {
+                    listItems.push(line.slice(2))
+                } else if (line.trim()) {
+                    flushList()
+                    const inlineCodeMatch = line.match(/`([^`]+)`/)
+                    if (inlineCodeMatch && components?.code) {
+                        const CodeComponent = components.code
                         elements.push(
-                            <CodeComponent key={`code-${i}`} className={`language-${codeLang}`}>
-                                {codeStr}
-                            </CodeComponent>
+                            <p key={i}>
+                                <CodeComponent key={`inline-${i}`}>
+                                    {inlineCodeMatch[1]}
+                                </CodeComponent>
+                            </p>
                         )
                     } else {
-                        elements.push(
-                            <pre key={`code-${i}`}>
-                                <code className={`language-${codeLang}`}>{codeStr}</code>
-                            </pre>
-                        )
+                        elements.push(<p key={i}>{line}</p>)
                     }
-                    inCode = false
-                    codeLang = ''
-                    codeLines = []
                 }
-            } else if (inCode) {
-                codeLines.push(line)
-            } else if (line.startsWith('# ')) {
-                flushList()
-                elements.push(<h1 key={i}>{line.slice(2)}</h1>)
-            } else if (line.startsWith('## ')) {
-                flushList()
-                elements.push(<h2 key={i}>{line.slice(3)}</h2>)
-            } else if (line.startsWith('- ')) {
-                listItems.push(line.slice(2))
-            } else if (line.trim()) {
-                flushList()
-                const inlineCodeMatch = line.match(/`([^`]+)`/)
-                if (inlineCodeMatch && components?.code) {
-                    const CodeComponent = components.code
-                    elements.push(
-                        <p key={i}>
-                            <CodeComponent key={`inline-${i}`}>{inlineCodeMatch[1]}</CodeComponent>
-                        </p>
-                    )
-                } else {
-                    elements.push(<p key={i}>{line}</p>)
-                }
-            }
-        })
-        flushList()
-        return <div data-testid="markdown-content">{elements}</div>
+            })
+            flushList()
+            return <div data-testid="markdown-content">{elements}</div>
+        },
     }
 })
 
-jest.mock('remark-gfm', () => () => {})
-jest.mock('remark-frontmatter', () => () => {})
-jest.mock('rehype-slug', () => () => {})
+vi.mock('remark-gfm', () => ({ default: () => {} }))
+vi.mock('remark-frontmatter', () => ({ default: () => {} }))
+vi.mock('rehype-slug', () => ({ default: () => {} }))
 
-jest.mock('shiki', () => ({
-    codeToHtml: jest.fn((code, { lang }) =>
+vi.mock('shiki', () => ({
+    codeToHtml: vi.fn((code, { lang }) =>
         Promise.resolve(`<pre data-language="${lang}"><code>${code}</code></pre>`)
     ),
 }))
 
-const MarkdownViewer = require('../../src/renderer/src/components/MarkdownViewer/index.jsx').default
-const { codeToHtml } = require('shiki')
+import MarkdownViewer from '../../src/renderer/src/components/MarkdownViewer/index.jsx'
+import { codeToHtml } from 'shiki'
 
 const sampleMarkdown = `# Hello World
 
@@ -106,7 +110,7 @@ console.log('hello')
 
 describe('MarkdownViewer', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
     })
     test('renders an H1 from a markdown heading', async () => {
         await act(async () => {

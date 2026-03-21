@@ -1,14 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-jest.mock('../../src/renderer/src/hooks/useDebounce.js', () => ({
+vi.mock('../../src/renderer/src/hooks/useDebounce.js', () => ({
     __esModule: true,
     default: (value) => value,
 }))
 
-jest.mock('../../src/renderer/src/hooks/useFileTree.js', () => ({
+vi.mock('../../src/renderer/src/hooks/useFileTree.js', () => ({
     __esModule: true,
-    default: jest.fn(),
+    default: vi.fn(),
     ICON_FOLDER_CLOSED: '▶',
     ICON_FOLDER_OPEN: '▼',
     ICON_MD: '📝',
@@ -16,7 +16,7 @@ jest.mock('../../src/renderer/src/hooks/useFileTree.js', () => ({
 }))
 
 import Sidebar from '../../src/renderer/src/components/Sidebar/index.jsx'
-const useFileTree = require('../../src/renderer/src/hooks/useFileTree.js').default
+import useFileTree from '../../src/renderer/src/hooks/useFileTree.js'
 
 const ROOT = '/home/user/notes'
 
@@ -27,15 +27,15 @@ function makeTreeState(overrides = {}) {
         expandedPaths: new Set(),
         loading: false,
         error: null,
-        openFolder: jest.fn(),
-        toggleFolder: jest.fn(),
+        openFolder: vi.fn(),
+        toggleFolder: vi.fn(),
         ...overrides,
     }
 }
 
 describe('Sidebar — empty state', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         useFileTree.mockReturnValue(makeTreeState())
     })
 
@@ -52,7 +52,7 @@ describe('Sidebar — empty state', () => {
     })
 
     test('clicking Open Folder triggers openFolder from hook', () => {
-        const openFolder = jest.fn()
+        const openFolder = vi.fn()
         useFileTree.mockReturnValue(makeTreeState({ openFolder }))
 
         render(<Sidebar rootFolderPath={null} />)
@@ -64,7 +64,7 @@ describe('Sidebar — empty state', () => {
 
 describe('Sidebar — loading state', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         useFileTree.mockReturnValue(makeTreeState({ rootFolderPath: ROOT, loading: true }))
     })
 
@@ -77,7 +77,7 @@ describe('Sidebar — loading state', () => {
 
 describe('Sidebar — error state', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         useFileTree.mockReturnValue(
             makeTreeState({ rootFolderPath: ROOT, error: 'Permission denied' })
         )
@@ -109,7 +109,7 @@ describe('Sidebar — tree rendering', () => {
     }
 
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         useFileTree.mockReturnValue(
             makeTreeState({
                 rootFolderPath: ROOT,
@@ -145,7 +145,7 @@ describe('Sidebar — tree rendering', () => {
     })
 
     test('clicking a folder node calls toggleFolder', () => {
-        const toggleFolder = jest.fn()
+        const toggleFolder = vi.fn()
         useFileTree.mockReturnValue(
             makeTreeState({
                 rootFolderPath: ROOT,
@@ -161,7 +161,7 @@ describe('Sidebar — tree rendering', () => {
     })
 
     test('clicking an md file node calls onOpenFile with its path', () => {
-        const onOpenFile = jest.fn()
+        const onOpenFile = vi.fn()
         useFileTree.mockReturnValue(
             makeTreeState({
                 rootFolderPath: ROOT,
@@ -178,7 +178,7 @@ describe('Sidebar — tree rendering', () => {
 
 describe('Sidebar — header', () => {
     beforeEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
         useFileTree.mockReturnValue(makeTreeState({ rootFolderPath: ROOT }))
     })
 
@@ -209,8 +209,8 @@ describe('Sidebar — document list (US1)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         expect(screen.getByText('Alpha Note')).toBeInTheDocument()
@@ -223,8 +223,8 @@ describe('Sidebar — document list (US1)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId="doc-2"
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const betaEntry = screen.getByTitle('Beta Guide')
@@ -238,21 +238,21 @@ describe('Sidebar — document list (US1)', () => {
             <Sidebar
                 documents={[]}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         expect(screen.getByText(/no documents yet/i)).toBeInTheDocument()
     })
 
     test('clicking a row fires onOpenDocument with correct id and name', () => {
-        const onOpenDocument = jest.fn()
+        const onOpenDocument = vi.fn()
         render(
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
                 onOpenDocument={onOpenDocument}
-                onNewDocument={jest.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         fireEvent.click(screen.getByTitle('Gamma Tips'))
@@ -267,8 +267,8 @@ describe('Sidebar — search / filter (US2)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const input = screen.getByPlaceholderText(/search/i)
@@ -283,8 +283,8 @@ describe('Sidebar — search / filter (US2)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const input = screen.getByPlaceholderText(/search/i)
@@ -300,8 +300,8 @@ describe('Sidebar — search / filter (US2)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const input = screen.getByPlaceholderText(/search/i)
@@ -314,8 +314,8 @@ describe('Sidebar — search / filter (US2)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const input = screen.getByPlaceholderText(/search/i)
@@ -329,8 +329,8 @@ describe('Sidebar — search / filter (US2)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         const input = screen.getByPlaceholderText(/search/i)
@@ -346,20 +346,20 @@ describe('Sidebar — new document button (US4)', () => {
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
-                onNewDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
+                onNewDocument={vi.fn()}
             />
         )
         expect(screen.getByRole('button', { name: /new document/i })).toBeInTheDocument()
     })
 
     test('clicking "+" fires onNewDocument callback exactly once', () => {
-        const onNewDocument = jest.fn()
+        const onNewDocument = vi.fn()
         render(
             <Sidebar
                 documents={sampleDocs}
                 activeDocumentId={null}
-                onOpenDocument={jest.fn()}
+                onOpenDocument={vi.fn()}
                 onNewDocument={onNewDocument}
             />
         )

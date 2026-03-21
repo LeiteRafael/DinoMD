@@ -1,21 +1,20 @@
 import { renderHook, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
-jest.mock('../../src/renderer/src/services/api.js', () => ({
+vi.mock('../../src/renderer/src/services/api.js', () => ({
     api: {
-        create: jest.fn(),
-        readContent: jest.fn(),
-        save: jest.fn(),
-        rename: jest.fn(),
-        delete: jest.fn(),
-        onFileChangedExternally: jest.fn(),
-        removeFileChangedListener: jest.fn(),
+        create: vi.fn(),
+        readContent: vi.fn(),
+        save: vi.fn(),
+        rename: vi.fn(),
+        delete: vi.fn(),
+        onFileChangedExternally: vi.fn(),
+        removeFileChangedListener: vi.fn(),
     },
 }))
-const { api } = require('../../src/renderer/src/services/api.js')
-const useEditorModule = require('../../src/renderer/src/hooks/useEditor.js')
-const useEditor = useEditorModule.default
+import { api } from '../../src/renderer/src/services/api.js'
+import useEditor from '../../src/renderer/src/hooks/useEditor.js'
 beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 })
 describe('openNew', () => {
     test('creates a draft session with empty content and isDraft=true', async () => {

@@ -30,6 +30,9 @@ vi.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
 }))
 import { copyToClipboard, stripMarkdown } from '../../src/renderer/src/utils/clipboardUtils.js'
 import SplitViewPage from '../../src/renderer/src/pages/SplitViewPage.jsx'
+beforeEach(() => {
+    vi.clearAllMocks()
+})
 function makeHook(overrides = {}) {
     const { session: sessionOverrides, ...hookOverrides } = overrides
     return {
@@ -60,6 +63,7 @@ function makeHook(overrides = {}) {
 describe('SplitViewPage rendering', () => {
     test('renders in split mode with both panes present', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
+
         expect(
             screen.getByRole('textbox', {
                 name: /markdown editor/i,
@@ -67,10 +71,13 @@ describe('SplitViewPage rendering', () => {
         ).toBeInTheDocument()
         expect(screen.getByTestId('panel-group')).toBeInTheDocument()
     })
+
     test('displays the document name in the header', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
+
         expect(screen.getByText(/Test Doc/)).toBeInTheDocument()
     })
+
     test('shows "Nothing to preview yet" when content is empty', () => {
         render(
             <SplitViewPage
@@ -84,6 +91,7 @@ describe('SplitViewPage rendering', () => {
                 onDocumentSaved={vi.fn()}
             />
         )
+
         expect(screen.getByText(/Nothing to preview yet/i)).toBeInTheDocument()
     })
 })
@@ -95,6 +103,7 @@ describe('ViewModeToggle', () => {
                 name: /editor only/i,
             })
         )
+
         expect(screen.queryByTestId('panel-group')).not.toBeInTheDocument()
         expect(
             screen.getByRole('textbox', {
@@ -102,6 +111,7 @@ describe('ViewModeToggle', () => {
             })
         ).toBeInTheDocument()
     })
+
     test('clicking Preview Only hides the editor textarea (via display:none)', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
         fireEvent.click(
@@ -109,6 +119,7 @@ describe('ViewModeToggle', () => {
                 name: /preview only/i,
             })
         )
+
         const textarea = screen.getByRole('textbox', {
             name: /markdown editor/i,
             hidden: true,
@@ -117,6 +128,7 @@ describe('ViewModeToggle', () => {
             display: 'none',
         })
     })
+
     test('toggling back to Split restores both panes', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
         fireEvent.click(
@@ -129,6 +141,7 @@ describe('ViewModeToggle', () => {
                 name: /^split$/i,
             })
         )
+
         expect(screen.getByTestId('panel-group')).toBeInTheDocument()
         expect(
             screen.getByRole('textbox', {
@@ -136,6 +149,7 @@ describe('ViewModeToggle', () => {
             })
         ).toBeInTheDocument()
     })
+
     test('editor content is unchanged across all mode switches', () => {
         const hook = makeHook({
             session: {
@@ -143,6 +157,7 @@ describe('ViewModeToggle', () => {
                 savedContent: '# My Content',
             },
         })
+
         render(<SplitViewPage editorHook={hook} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
         fireEvent.click(
             screen.getByRole('button', {
@@ -159,6 +174,7 @@ describe('ViewModeToggle', () => {
                 name: /^split$/i,
             })
         )
+
         expect(
             screen.getByRole('textbox', {
                 name: /markdown editor/i,
@@ -169,6 +185,7 @@ describe('ViewModeToggle', () => {
 describe('Navigation guard', () => {
     test('shows unsaved changes modal when navigating back with dirty content', () => {
         const onBack = vi.fn()
+
         render(
             <SplitViewPage
                 editorHook={makeHook({
@@ -183,6 +200,7 @@ describe('Navigation guard', () => {
                 name: /back/i,
             })
         )
+
         expect(
             screen.getByRole('heading', {
                 name: /Unsaved changes/i,
@@ -190,8 +208,10 @@ describe('Navigation guard', () => {
         ).toBeInTheDocument()
         expect(onBack).not.toHaveBeenCalled()
     })
+
     test('calls onBack directly when content is not dirty', () => {
         const onBack = vi.fn()
+
         render(
             <SplitViewPage
                 editorHook={makeHook({
@@ -206,19 +226,24 @@ describe('Navigation guard', () => {
                 name: /back/i,
             })
         )
+
         expect(onBack).toHaveBeenCalledTimes(1)
     })
 })
 describe('Sync Scroll toggle', () => {
     test('renders the sync scroll button', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
+
         expect(screen.getByTitle(/synchronized scrolling/i)).toBeInTheDocument()
     })
+
     test('sync button toggles aria-pressed state', () => {
         render(<SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />)
         const btn = screen.getByTitle(/synchronized scrolling/i)
         expect(btn).toHaveAttribute('aria-pressed', 'true')
+
         fireEvent.click(btn)
+
         expect(btn).toHaveAttribute('aria-pressed', 'false')
     })
 })
@@ -227,6 +252,7 @@ describe('Layout', () => {
         const { container } = render(
             <SplitViewPage editorHook={makeHook()} onBack={vi.fn()} onDocumentSaved={vi.fn()} />
         )
+
         const outerDiv = container.firstChild
         expect(outerDiv.className).toContain('minWidth')
     })

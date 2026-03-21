@@ -17,6 +17,9 @@ vi.mock('../../src/renderer/src/utils/clipboardUtils.js', () => ({
 }))
 import { copyToClipboard, stripMarkdown } from '../../src/renderer/src/utils/clipboardUtils.js'
 import EditorPage from '../../src/renderer/src/pages/EditorPage.jsx'
+beforeEach(() => {
+    vi.clearAllMocks()
+})
 function makeHook(overrides = {}) {
     const { session: sessionOverrides, ...hookOverrides } = overrides
     return {
@@ -69,8 +72,10 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(screen.getByText('My Doc')).toBeInTheDocument()
     })
+
     test('shows a Save button', () => {
         render(
             <EditorPage
@@ -80,12 +85,14 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.getByRole('button', {
                 name: /save/i,
             })
         ).toBeInTheDocument()
     })
+
     test('shows a Delete button for non-draft documents', () => {
         render(
             <EditorPage
@@ -99,12 +106,14 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.getByRole('button', {
                 name: /delete/i,
             })
         ).toBeInTheDocument()
     })
+
     test('does NOT show a Delete button for drafts', () => {
         render(
             <EditorPage
@@ -118,12 +127,14 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.queryByRole('button', {
                 name: /delete document/i,
             })
         ).not.toBeInTheDocument()
     })
+
     test('Save button is disabled when not dirty and not a draft', () => {
         render(
             <EditorPage
@@ -138,12 +149,14 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.getByRole('button', {
                 name: /save/i,
             })
         ).toBeDisabled()
     })
+
     test('Save button is enabled when isDirty', () => {
         render(
             <EditorPage
@@ -155,12 +168,14 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.getByRole('button', {
                 name: /save/i,
             })
         ).not.toBeDisabled()
     })
+
     test('shows "Saving…" label while save is in progress', () => {
         render(
             <EditorPage
@@ -172,8 +187,10 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(screen.getByText(/saving/i)).toBeInTheDocument()
     })
+
     test('displays a Back button', () => {
         render(
             <EditorPage
@@ -183,6 +200,7 @@ describe('EditorPage rendering', () => {
                 onDocumentDeleted={vi.fn()}
             />
         )
+
         expect(
             screen.getByRole('button', {
                 name: /back/i,
@@ -193,6 +211,7 @@ describe('EditorPage rendering', () => {
 describe('navigation guard (unsaved changes)', () => {
     test('calls onBack immediately when not dirty', () => {
         const onBack = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -208,10 +227,13 @@ describe('navigation guard (unsaved changes)', () => {
                 name: /back/i,
             })
         )
+
         expect(onBack).toHaveBeenCalledTimes(1)
     })
+
     test('shows ConfirmModal (not onBack) when Back is clicked with unsaved changes', () => {
         const onBack = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -227,6 +249,7 @@ describe('navigation guard (unsaved changes)', () => {
                 name: /back/i,
             })
         )
+
         expect(onBack).not.toHaveBeenCalled()
         expect(screen.getByRole('dialog')).toBeInTheDocument()
         expect(
@@ -235,9 +258,11 @@ describe('navigation guard (unsaved changes)', () => {
             })
         ).toBeInTheDocument()
     })
+
     test('closes modal and calls onBack when Discard is chosen', () => {
         const onBack = vi.fn()
         const discard = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -260,12 +285,15 @@ describe('navigation guard (unsaved changes)', () => {
                 name: /discard/i,
             })
         )
+
         expect(discard).toHaveBeenCalledTimes(1)
         expect(onBack).toHaveBeenCalledTimes(1)
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
+
     test('closes modal without calling onBack when Cancel is chosen', () => {
         const onBack = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -287,9 +315,11 @@ describe('navigation guard (unsaved changes)', () => {
                 name: /^cancel$/i,
             })
         )
+
         expect(onBack).not.toHaveBeenCalled()
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
+
     test('saves and calls onBack when Save is chosen in the modal', async () => {
         const onBack = vi.fn()
         const save = vi.fn(() =>
@@ -298,6 +328,7 @@ describe('navigation guard (unsaved changes)', () => {
                 canceled: false,
             })
         )
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -319,6 +350,7 @@ describe('navigation guard (unsaved changes)', () => {
                 name: /^save$/i,
             })
         )
+
         await waitFor(() => {
             expect(save).toHaveBeenCalledTimes(1)
             expect(onBack).toHaveBeenCalledTimes(1)
@@ -344,9 +376,11 @@ describe('delete flow', () => {
                 name: /delete document/i,
             })
         )
+
         expect(screen.getByRole('dialog')).toBeInTheDocument()
         expect(screen.getByText(/delete document/i)).toBeInTheDocument()
     })
+
     test('calls deleteDocument and onDocumentDeleted on confirmation', async () => {
         const deleteDocument = vi.fn(() =>
             Promise.resolve({
@@ -356,6 +390,7 @@ describe('delete flow', () => {
             })
         )
         const onDocumentDeleted = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -379,13 +414,16 @@ describe('delete flow', () => {
                 name: /move to trash/i,
             })
         )
+
         await waitFor(() => {
             expect(deleteDocument).toHaveBeenCalledTimes(1)
             expect(onDocumentDeleted).toHaveBeenCalledWith('doc-001')
         })
     })
+
     test('closes modal without deleting when Cancel is clicked', () => {
         const deleteDocument = vi.fn()
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -409,9 +447,11 @@ describe('delete flow', () => {
                 name: /^cancel$/i,
             })
         )
+
         expect(deleteDocument).not.toHaveBeenCalled()
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
+
     test('shows force-delete modal when trashItem fails (canForceDelete=true)', async () => {
         const deleteDocument = vi.fn(() =>
             Promise.resolve({
@@ -420,6 +460,7 @@ describe('delete flow', () => {
                 error: 'Trash unavailable',
             })
         )
+
         render(
             <EditorPage
                 editorHook={makeHook({
@@ -443,6 +484,7 @@ describe('delete flow', () => {
                 name: /move to trash/i,
             })
         )
+
         await waitFor(() => {
             expect(screen.getByText(/move to trash failed/i)).toBeInTheDocument()
         })
@@ -459,12 +501,14 @@ describe('inline title rename', () => {
             />
         )
         fireEvent.click(screen.getByText('My Doc'))
+
         expect(
             screen.getByRole('textbox', {
                 name: /document name/i,
             })
         ).toBeInTheDocument()
     })
+
     test('pressing Escape reverts to the original name without calling rename', () => {
         render(
             <EditorPage
@@ -486,6 +530,7 @@ describe('inline title rename', () => {
         fireEvent.keyDown(input, {
             key: 'Escape',
         })
+
         expect(
             screen.queryByRole('textbox', {
                 name: /document name/i,

@@ -8,10 +8,13 @@ describe('useDebounce', () => {
     afterEach(() => {
         vi.useRealTimers()
     })
+
     test('returns the initial value immediately', () => {
         const { result } = renderHook(() => useDebounce('hello', 300))
+
         expect(result.current).toBe('hello')
     })
+
     test('does not update before the delay expires', () => {
         const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
             initialProps: {
@@ -19,6 +22,7 @@ describe('useDebounce', () => {
                 delay: 300,
             },
         })
+
         rerender({
             value: 'updated',
             delay: 300,
@@ -26,8 +30,10 @@ describe('useDebounce', () => {
         act(() => {
             vi.advanceTimersByTime(200)
         })
+
         expect(result.current).toBe('initial')
     })
+
     test('updates after the delay expires', () => {
         const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
             initialProps: {
@@ -35,6 +41,7 @@ describe('useDebounce', () => {
                 delay: 300,
             },
         })
+
         rerender({
             value: 'updated',
             delay: 300,
@@ -42,8 +49,10 @@ describe('useDebounce', () => {
         act(() => {
             vi.advanceTimersByTime(300)
         })
+
         expect(result.current).toBe('updated')
     })
+
     test('resets the timer on rapid successive changes (only last value applied)', () => {
         const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
             initialProps: {
@@ -51,6 +60,7 @@ describe('useDebounce', () => {
                 delay: 300,
             },
         })
+
         rerender({
             value: 'v2',
             delay: 300,
@@ -65,10 +75,13 @@ describe('useDebounce', () => {
         act(() => {
             vi.advanceTimersByTime(100)
         })
+
         expect(result.current).toBe('v1')
+
         act(() => {
             vi.advanceTimersByTime(200)
         })
+
         expect(result.current).toBe('v3')
     })
 })

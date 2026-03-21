@@ -1,14 +1,33 @@
-/** Traceability Index
- *
- * Spec 001 — DinoMD Markdown Reader     →  tests/e2e/001-import-view.e2e.js       (headingsDoc, codeBlocksDoc, listsDoc)
- * Spec 002 — Create & Edit              →  tests/e2e/002-create-edit.e2e.js        (editContentDoc)
- * Spec 003 — Split View Preview         →  tests/e2e/003-split-view.e2e.js         (splitViewDoc)
- * Spec 004 — File Browser Sidebar       →  tests/e2e/004-file-browser.e2e.js       (fileBrowserDoc)
- * Spec 005 — Enhanced Markdown Editor   →  tests/e2e/005-enhanced-editor.e2e.js    (editorDoc)
- * Spec 006 — Editor UI Refinements      →  tests/e2e/006-ui-refinements.e2e.js     (splitViewDoc)
- * Spec 007 — File Tree Sidebar          →  tests/e2e/007-file-tree.e2e.js          (no fixture — uses window.showDirectoryPicker stub)
- * Spec 008 — Copy & Save Shortcuts      →  tests/e2e/008-copy-save.e2e.js          (copyDoc)
- */
+export const traceabilityIndex = {
+    '001': {
+        spec: 'DinoMD Markdown Reader',
+        file: '001-import-view.e2e.js',
+        fixtures: ['headingsDoc', 'codeBlocksDoc', 'listsDoc'],
+    },
+    '002': { spec: 'Create & Edit', file: '002-create-edit.e2e.js', fixtures: ['editContentDoc'] },
+    '003': {
+        spec: 'Split View Preview',
+        file: '003-split-view.e2e.js',
+        fixtures: ['splitViewDoc'],
+    },
+    '004': {
+        spec: 'File Browser Sidebar',
+        file: '004-file-browser.e2e.js',
+        fixtures: ['fileBrowserDoc'],
+    },
+    '005': {
+        spec: 'Enhanced Markdown Editor',
+        file: '005-enhanced-editor.e2e.js',
+        fixtures: ['editorDoc'],
+    },
+    '006': {
+        spec: 'Editor UI Refinements',
+        file: '006-ui-refinements.e2e.js',
+        fixtures: ['splitViewDoc'],
+    },
+    '007': { spec: 'File Tree Sidebar', file: '007-file-tree.e2e.js', fixtures: [] },
+    '008': { spec: 'Copy & Save Shortcuts', file: '008-copy-save.e2e.js', fixtures: ['copyDoc'] },
+}
 
 export const headingsDoc = {
     id: 'fixture-001',

@@ -82,7 +82,7 @@ vi.mock('../../src/renderer/src/services/api.js', () => ({
     },
 }))
 
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import App from '../../src/renderer/src/App.jsx'
 import { api } from '../../src/renderer/src/services/api.js'

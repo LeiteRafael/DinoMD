@@ -7,7 +7,7 @@ test.describe('spec 004 — file browser sidebar', () => {
         await page.addInitScript(
             (docs) => {
                 const DOCS_KEY = 'dinomd:docs'
-                const meta = docs.map(({ content, ...m }) => m)
+                const meta = docs.map(({ content: _content, ...m }) => m)
                 localStorage.setItem(DOCS_KEY, JSON.stringify(meta))
                 docs.forEach((doc) => {
                     if (doc.content != null) {

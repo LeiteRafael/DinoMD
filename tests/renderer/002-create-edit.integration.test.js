@@ -74,27 +74,25 @@ describe('EditorPage + useEditor integration', () => {
         render(<EditorIntegration doc={existingDoc} />)
 
         await waitFor(() =>
-            expect(
-                screen.getByRole('textbox', { name: /markdown editor/i })
-            ).toHaveValue('# Hello World')
+            expect(screen.getByRole('textbox', { name: /markdown editor/i })).toHaveValue(
+                '# Hello World'
+            )
         )
     })
 
     test('calls api.save when Save button is clicked after editing content', async () => {
         render(<EditorIntegration doc={existingDoc} />)
         await waitFor(() =>
-            expect(
-                screen.getByRole('textbox', { name: /markdown editor/i })
-            ).toHaveValue('# Hello World')
+            expect(screen.getByRole('textbox', { name: /markdown editor/i })).toHaveValue(
+                '# Hello World'
+            )
         )
 
         fireEvent.change(screen.getByRole('textbox', { name: /markdown editor/i }), {
             target: { value: '# Hello World\n\nEdited.' },
         })
         await waitFor(() =>
-            expect(
-                screen.getByRole('button', { name: /save document/i })
-            ).not.toBeDisabled()
+            expect(screen.getByRole('button', { name: /save document/i })).not.toBeDisabled()
         )
 
         fireEvent.click(screen.getByRole('button', { name: /save document/i }))
@@ -104,9 +102,7 @@ describe('EditorPage + useEditor integration', () => {
 
     test('calls api.save when Ctrl+S is pressed on a persisted document', async () => {
         render(<EditorIntegration doc={existingDoc} />)
-        await waitFor(() =>
-            screen.getByRole('textbox', { name: /markdown editor/i })
-        )
+        await waitFor(() => screen.getByRole('textbox', { name: /markdown editor/i }))
 
         fireEvent.keyDown(window, { ctrlKey: true, key: 's' })
 

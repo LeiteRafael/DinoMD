@@ -31,6 +31,9 @@ module.exports = {
             globals: {
                 vi: 'readonly',
             },
+            rules: {
+                'no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
+            },
         },
     ],
 }

@@ -103,8 +103,116 @@
     font-weight: 600;
 }
 
-.codeWrapper {
+.codeBlockOuter {
+    position: relative;
     margin: 1em 0;
+}
+
+.snapshotToggleBtn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.5);
+    color: #abb2bf;
+    border: 1px solid rgba(171, 178, 191, 0.3);
+    border-radius: var(--radius);
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.codeBlockOuter:hover .snapshotToggleBtn {
+    opacity: 1;
+}
+
+.snapshotOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.snapshotModal {
+    display: flex;
+    flex-direction: column;
+    max-width: 860px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #1e2128;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.modalToolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.snapshotExportBtn {
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.snapshotExportBtn:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.snapshotExportBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.closeModalBtn {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.closeModalBtn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.snapshotPreview {
+    overflow: auto;
+    flex: 1;
+}
+
+.snapshotError {
+    font-size: 0.75rem;
+    color: var(--color-danger);
+}
+
+.codeWrapper {
     border-radius: var(--radius);
     overflow: hidden;
     font-size: 0.875rem;

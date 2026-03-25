@@ -6,7 +6,8 @@ const CODE_FENCE_PATTERN = /^```/
 const CODE_TOKEN_RE =
     /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`[^`]*`)|((\/\/).*$|(#).*$)|(\b\d+\.?\d*\b)|\b(if|else|for|while|return|function|const|let|var|class|def|import|export|from|in|of|do|switch|case|break|continue|try|catch|finally|new|typeof|void|async|await|static|public|private|protected|true|false|null|undefined)\b|([+\-*/%=!|^~?:]+|[(){}[\];,.])/g
 
-const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+export const escapeHtml = (text) =>
+    text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 export const tokenizeCodeLine = (escapedLine) =>
     escapedLine.replace(CODE_TOKEN_RE, (match, g1, g2, _g3, _g4, g5, g6) => {
@@ -20,6 +21,21 @@ export const tokenizeCodeLine = (escapedLine) =>
                     : g6 !== undefined
                       ? 'token-code-kw'
                       : 'token-code-op'
+        return `<span class="${cls}">${match}</span>`
+    })
+
+export const tokenizeSnapshotLine = (escapedLine) =>
+    escapedLine.replace(CODE_TOKEN_RE, (match, g1, g2, _g3, _g4, g5, g6) => {
+        const cls =
+            g1 !== undefined
+                ? 'snap-token-string'
+                : g2 !== undefined
+                  ? 'snap-token-comment'
+                  : g5 !== undefined
+                    ? 'snap-token-number'
+                    : g6 !== undefined
+                      ? 'snap-token-keyword'
+                      : 'snap-token-punctuation'
         return `<span class="${cls}">${match}</span>`
     })
 

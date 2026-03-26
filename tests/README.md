@@ -12,6 +12,20 @@ tests/
 
 ---
 
+## Naming conventions
+
+| Test type   | Pattern                                    | Example                                  |
+|-------------|--------------------------------------------|------------------------------------------|
+| Unit        | `{kebab-case-name}.unit.test.{js,jsx}`     | `document-card.unit.test.js`             |
+| Integration | `{num}-{feature}.integration.test.js`      | `001-import-view.integration.test.js`    |
+| E2E         | `{num}-{feature}.e2e.js`                   | `001-import-view.e2e.js`                 |
+
+All unit test files use **kebab-case** and include a `.unit` type suffix.
+Integration tests keep their numeric prefix for ordering and include `.integration`.
+E2E tests follow the same numeric prefix pattern with `.e2e`.
+
+---
+
 ## E2E — `tests/e2e/`
 
 **Pattern:** `{num}-{feature}.e2e.js`
@@ -25,28 +39,14 @@ tests/
 006-ui-refinements.e2e.js
 007-file-tree.e2e.js
 008-copy-save.e2e.js
+010-code-snapshot.e2e.js
 ```
-
-Consistent and well organized.
 
 ---
 
 ## Unit — `tests/main/`
 
-**Current pattern:** `{domain}.test.js` (no type suffix)
-
-```
-documents.test.js
-documents-edit.test.js
-folder.test.js
-ui-state.test.js
-```
-
-**Issues:**
-- No indication these are **unit** tests — could be confused with integration
-- `documents.test.js` and `documents-edit.test.js` cover the same domain but are split without clear criteria
-
-**Suggested rename:** add `.unit` to the suffix
+**Pattern:** `{domain}.unit.test.js`
 
 ```
 documents.unit.test.js
@@ -57,80 +57,56 @@ ui-state.unit.test.js
 
 ---
 
-## Unit + Integration mixed — `tests/renderer/`
+## Unit + Integration — `tests/renderer/`
 
-The biggest organizational problem. Three different naming styles coexist in the same flat directory:
+### Unit tests
 
-| Group | Current pattern | Actual type |
-|---|---|---|
-| `DocumentCard.test.js`, `Sidebar.test.js` … | `PascalCase.test.js` | unit — components |
-| `useDebounce.test.js`, `clipboardUtils.test.js` … | `camelCase.test.js` | unit — hooks/utils |
-| `001-import-view.integration.test.js` … | `{num}-{feature}.integration.test.js` | integration |
-| `010-api.test.js` | `{num}-{feature}.test.js` | unit (outlier) |
-
-**Issues:**
-1. **Inconsistent casing** among unit tests: components in `PascalCase`, hooks/utils in `camelCase`
-2. **`010-api.test.js`** has a numeric prefix (integration pattern) but is a unit test and lacks `.integration` in its name — outlier
-3. Unit and integration tests live **in the same flat directory** with no visual separation
-
----
-
-## Proposed solutions
-
-### Option A — Minimal (rename only)
-
-Standardize casing to `kebab-case` and add `.unit` suffix; fix the outlier:
+**Pattern:** `{kebab-case-name}.unit.test.{js,jsx}`
 
 ```
-# unit tests
+# components
+code-panel-header.unit.test.jsx
 document-card.unit.test.js
 document-list.unit.test.js
 editor-page.unit.test.js
 markdown-editor.unit.test.js
 markdown-viewer.unit.test.js
 sidebar.unit.test.js
+snapshot-pane.unit.test.jsx
 split-view-page.unit.test.js
-clipboard-utils.unit.test.js
-markdown-tokenizer.unit.test.js
+
+# hooks
 use-debounce.unit.test.js
 use-documents.unit.test.js
 use-editor.unit.test.js
 use-file-tree.unit.test.js
 use-sidebar.unit.test.js
+use-snapshot-export.unit.test.js
+use-snapshot-mode.unit.test.js
 use-sync-scroll.unit.test.js
 use-toast.unit.test.js
-api.unit.test.js            ← removes numeric prefix, adds .unit
 
-# integration tests — no change needed
+# utils
+api.unit.test.js
+clipboard-utils.unit.test.js
+language-from-extension.unit.test.js
+markdown-tokenizer.unit.test.js
+snapshot-export.unit.test.js
+```
+
+### Integration tests
+
+**Pattern:** `{num}-{feature}.integration.test.js`
+
+```
 001-import-view.integration.test.js
-...
+002-create-edit.integration.test.js
+003-split-view.integration.test.js
+004-file-browser.integration.test.js
+005-enhanced-editor.integration.test.js
+006-ui-refinements.integration.test.js
+007-file-tree.integration.test.js
+008-copy-save.integration.test.js
+009-reader-page.integration.test.js
+011-app.integration.test.js
 ```
-
-### Option B — Structural (split into subfolders)
-
-```
-tests/
-  renderer/
-    unit/
-      document-card.test.js
-      use-debounce.test.js
-      ...
-    integration/
-      001-import-view.test.js   ← .integration implicit from folder name
-      ...
-  main/
-    unit/
-      documents.test.js
-      ...
-```
-
----
-
-## Issues by priority
-
-| Priority | Issue | File(s) |
-|---|---|---|
-| High | `010-api.test.js` has numeric prefix but is a unit test | `renderer/010-api.test.js` |
-| High | Inconsistent casing in renderer unit tests (PascalCase vs camelCase) | `renderer/*.test.js` |
-| Medium | `tests/main/` files have no type indicator | `main/*.test.js` |
-| Low | Unit and integration tests share the same flat directory | `tests/renderer/` |

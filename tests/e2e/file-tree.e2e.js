@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { AppPage } from './pages/AppPage.js'
 
-test.describe('spec 007 — file tree sidebar', () => {
+test.describe('file tree — sidebar and folder browsing', () => {
     test('clicking Open Folder renders tree entries from the stubbed picker', async ({ page }) => {
         await page.addInitScript(() => {
             const mockEntries = [

@@ -20,7 +20,7 @@ const openSplitView = async (page, docName) => {
     await page.getByRole('button', { name: 'Open split view' }).click()
 }
 
-test.describe('spec 010 — code snapshot export', () => {
+test.describe('code snapshot — snapshot mode and export', () => {
     test('Snapshot toggle reveals the Code snapshot chrome', async ({ page }) => {
         await seedDoc(page, codeSnapshotDoc)
         const app = new AppPage(page)

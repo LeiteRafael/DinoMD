@@ -2,8 +2,9 @@ import { useState, useCallback } from 'react'
 import { captureElement, downloadBlob } from '../utils/snapshotExport.js'
 
 const buildFilename = (name) => {
-    const base = name && name.trim() ? name.trim() : 'snapshot'
-    return `snapshot-${base}.png`
+    const trimmed = name && name.trim()
+    if (!trimmed) return 'snapshot.png'
+    return `snapshot-${trimmed}.png`
 }
 
 const useSnapshotExport = (snapshotFrameRef, name) => {

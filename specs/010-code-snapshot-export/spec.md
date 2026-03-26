@@ -30,7 +30,7 @@ As a developer viewing a README in the split-view panel, I want to switch the co
 2. **Given** the panel is in Snapshot mode, **When** the user clicks the "Code" toggle button, **Then** the code panel returns to the plain, unstyled view.
 3. **Given** the app is opened on any file, **When** the split-view is first loaded, **Then** the default active mode is "Code" (plain view).
 5. **Given** a file named `server.js` is open in Snapshot mode, **When** the user views the title bar, **Then** the title bar displays `server.js` centered and muted.
-6. **Given** a file with no name (untitled buffer) is open in Snapshot mode, **When** the user views the title bar, **Then** the title bar displays the inferred language label (e.g., `javascript`) centered and muted; if the language cannot be inferred, the title bar is empty.
+5. **Given** a file with no name (untitled buffer) is open in Snapshot mode, **When** the user views the title bar, **Then** the title bar displays the inferred language label (e.g., `JavaScript`) centered and muted; if the language cannot be inferred, the title bar is empty.
 
 ---
 
@@ -86,7 +86,7 @@ As a developer, I want the code in the Snapshot view to have accurate syntax hig
 - **FR-001**: The split-view code panel header MUST include a two-option toggle with labels "Code" and "Snapshot", with only one option active at a time.
 - **FR-002**: The default active mode on load MUST be "Code" (plain, unstyled view).
 - **FR-003**: In Snapshot mode, the code panel MUST render a macOS-style window frame containing: three circular traffic-light dots (Close #FF5F57, Minimize #FFBD2E, Maximize #28C840) in the top-left, and a dark title bar background (#282c34).
-- **FR-004**: The title bar in Snapshot mode MUST display the filename centered and muted; if no filename is available, it MUST fall back to the inferred language label (e.g., `javascript`); if neither is available, the title bar area is left empty.
+- **FR-004**: The title bar in Snapshot mode MUST display the filename centered and muted; if no filename is available, it MUST fall back to the inferred language label (e.g., `JavaScript`); if neither is available, the title bar area is left empty.
 - **FR-005**: In Snapshot mode, the code content area MUST apply the One Monokai color palette: background #282c34, foreground #abb2bf, keywords #c678dd, strings #98c379, functions #61afef, numbers/constants #d19a66, comments #5c6370 italic, types/classes #e5c07b, punctuation #abb2bf.
 - **FR-006**: The code content area in Snapshot mode MUST use a monospace font at 13–14px size, line-height 1.6, and internal padding of 20px vertical / 24px horizontal.
 - **FR-007**: In Snapshot mode, long lines MUST trigger horizontal scrolling within the styled window; the window frame MUST NOT expand beyond its container.

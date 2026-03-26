@@ -34,7 +34,7 @@ export default defineConfig({
                 test: {
                     name: 'main',
                     environment: 'node',
-                    include: ['tests/main/unit/**/*.test.js'],
+                    include: ['tests/unit/main/**/*.test.js'],
                     globals: true,
                 },
             },
@@ -44,11 +44,11 @@ export default defineConfig({
                     name: 'renderer',
                     environment: 'jsdom',
                     include: [
-                        'tests/renderer/unit/**/*.test.{js,jsx}',
-                        'tests/renderer/integration/**/*.test.{js,jsx}',
+                        'tests/unit/renderer/**/*.test.{js,jsx}',
+                        'tests/integration/renderer/**/*.test.{js,jsx}',
                     ],
                     globals: true,
-                    setupFiles: ['tests/renderer/setup.js', '@testing-library/jest-dom'],
+                    setupFiles: ['tests/unit/renderer/setup.js', '@testing-library/jest-dom'],
                     css: {
                         modules: {
                             classNameStrategy: 'non-scoped',

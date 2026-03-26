@@ -4,10 +4,14 @@
 
 ```
 tests/
-├── __mocks__/          # Shared mocks (electron, styleMock)
-├── main/               # Unit tests — Electron main process
-├── renderer/           # Unit + integration tests — React renderer
-└── e2e/                # End-to-end tests (Playwright)
+├── __mocks__/                    # Shared mocks (electron, styleMock)
+├── main/
+│   └── unit/                     # Unit tests — Electron main process
+├── renderer/
+│   ├── unit/                     # Unit tests — React renderer
+│   ├── integration/              # Integration tests — React renderer
+│   └── setup.js                  # Shared test setup (jsdom polyfills)
+└── e2e/                          # End-to-end tests (Playwright)
 ```
 
 ---
@@ -44,7 +48,7 @@ E2E tests follow the same numeric prefix pattern with `.e2e`.
 
 ---
 
-## Unit — `tests/main/`
+## Unit — `tests/main/unit/`
 
 **Pattern:** `{domain}.unit.test.js`
 
@@ -57,9 +61,7 @@ ui-state.unit.test.js
 
 ---
 
-## Unit + Integration — `tests/renderer/`
-
-### Unit tests
+## Unit — `tests/renderer/unit/`
 
 **Pattern:** `{kebab-case-name}.unit.test.{js,jsx}`
 
@@ -94,7 +96,9 @@ markdown-tokenizer.unit.test.js
 snapshot-export.unit.test.js
 ```
 
-### Integration tests
+---
+
+## Integration — `tests/renderer/integration/`
 
 **Pattern:** `{num}-{feature}.integration.test.js`
 

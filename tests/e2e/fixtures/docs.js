@@ -27,6 +27,11 @@ export const traceabilityIndex = {
     },
     '007': { spec: 'File Tree Sidebar', file: '007-file-tree.e2e.js', fixtures: [] },
     '008': { spec: 'Copy & Save Shortcuts', file: '008-copy-save.e2e.js', fixtures: ['copyDoc'] },
+    '010': {
+        spec: 'Code Snapshot Export',
+        file: '010-code-snapshot.e2e.js',
+        fixtures: ['codeSnapshotDoc'],
+    },
 }
 
 export const headingsDoc = {
@@ -99,4 +104,13 @@ export const copyDoc = {
     orderIndex: 7,
     status: 'available',
     content: '# Copy & Save Test\n\nDocument for clipboard and save shortcut tests.\n',
+}
+
+export const codeSnapshotDoc = {
+    id: 'fixture-010',
+    name: 'example.js',
+    filePath: null,
+    orderIndex: 9,
+    status: 'available',
+    content: 'const greet = (name) => `Hello, ${name}!`\n\nexport default greet\n',
 }

@@ -1,0 +1,82 @@
+.header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    flex-shrink: 0;
+}
+
+.toggleGroup {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.toggleBtn {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    border-right: 1px solid var(--color-border);
+    padding: 0.3rem 0.65rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.toggleBtn:last-child {
+    border-right: none;
+}
+
+.toggleBtn:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.toggleBtn.active {
+    background: var(--color-accent);
+    color: #fff;
+}
+
+.exportArea {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.exportBtn {
+    background: transparent;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.3rem 0.65rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.exportBtn:hover:not(:disabled) {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.exportBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    font-size: 0.75rem;
+    color: var(--color-danger);
+    margin-left: 0.5rem;
+}

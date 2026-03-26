@@ -1,4 +1,8 @@
-import { tokenize, tokenizeCodeLine } from '../../src/renderer/src/utils/markdownTokenizer'
+import {
+    tokenize,
+    tokenizeCodeLine,
+    tokenizeSnapshotLine,
+} from '../../src/renderer/src/utils/markdownTokenizer'
 
 describe('tokenize', () => {
     test('# H1 heading produces output containing token-h1', () => {
@@ -95,5 +99,47 @@ describe('tokenizeCodeLine', () => {
 
     test('empty string returns empty string without error', () => {
         expect(tokenizeCodeLine('')).toBe('')
+    })
+})
+
+describe('tokenizeSnapshotLine', () => {
+    test('keyword produces output containing snap-token-keyword', () => {
+        const result = tokenizeSnapshotLine('const x')
+
+        expect(result).toContain('snap-token-keyword')
+    })
+
+    test('double-quoted string produces output containing snap-token-string', () => {
+        const result = tokenizeSnapshotLine('"hello"')
+
+        expect(result).toContain('snap-token-string')
+    })
+
+    test('number literal produces output containing snap-token-number', () => {
+        const result = tokenizeSnapshotLine('42')
+
+        expect(result).toContain('snap-token-number')
+    })
+
+    test('double-slash comment produces output containing snap-token-comment', () => {
+        const result = tokenizeSnapshotLine('// comment')
+
+        expect(result).toContain('snap-token-comment')
+    })
+
+    test('operator produces output containing snap-token-punctuation', () => {
+        const result = tokenizeSnapshotLine('x = 1')
+
+        expect(result).toContain('snap-token-punctuation')
+    })
+
+    test('does not produce any token-code-* class names', () => {
+        const result = tokenizeSnapshotLine('const x = 1')
+
+        expect(result).not.toContain('token-code-')
+    })
+
+    test('empty string returns empty string without error', () => {
+        expect(tokenizeSnapshotLine('')).toBe('')
     })
 })

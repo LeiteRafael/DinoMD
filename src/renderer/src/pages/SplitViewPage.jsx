@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import EditorPane from '../components/EditorPane/index.jsx'
+import CodePanel from '../components/CodePanel/index.jsx'
 import PreviewPane from '../components/PreviewPane/index.jsx'
 import SplitDivider from '../components/SplitDivider/index.jsx'
 import ViewModeToggle from '../components/ViewModeToggle/index.jsx'
@@ -113,13 +113,16 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
     const showEditor = viewMode === 'split' || viewMode === 'editor'
     const showPreview = viewMode === 'split' || viewMode === 'preview'
     const editorPane = (
-        <EditorPane
+        <CodePanel
             value={session.content}
             onChange={updateContent}
             onSave={handleSave}
             onDiscard={discard}
             containerRef={editorScrollRef}
             onScroll={onEditorScroll}
+            documentId={session.documentId}
+            documentName={session.name}
+            filePath={session.filePath}
         />
     )
     const previewPane = (

@@ -1,0 +1,108 @@
+.container {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    background: #1e2128;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.windowChrome {
+    background: #282c34;
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 0;
+    width: 100%;
+}
+
+.titleBar {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 12px;
+    background: #282c34;
+    position: relative;
+}
+
+.trafficLights {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.dotClose,
+.dotMinimize,
+.dotMaximize {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dotClose {
+    background: #ff5f57;
+}
+
+.dotMinimize {
+    background: #ffbd2e;
+}
+
+.dotMaximize {
+    background: #28c840;
+}
+
+.titleLabel {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #5c6370;
+    font-family: var(--font-mono, monospace);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60%;
+}
+
+.codeArea {
+    margin: 0;
+    padding: 20px 24px;
+    background: #282c34;
+    color: #abb2bf;
+    font-family: var(--font-mono, monospace);
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: auto;
+    overflow-y: visible;
+    white-space: pre;
+}
+
+.codeArea code {
+    font-family: inherit;
+    font-size: inherit;
+    background: none;
+}
+
+.snap-token-keyword {
+    color: #c678dd;
+}
+
+.snap-token-string {
+    color: #98c379;
+}
+
+.snap-token-number {
+    color: #d19a66;
+}
+
+.snap-token-comment {
+    color: #5c6370;
+    font-style: italic;
+}
+
+.snap-token-punctuation {
+    color: #abb2bf;
+}

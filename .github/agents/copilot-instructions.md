@@ -1,6 +1,6 @@
 # DinoMD Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-17
+Auto-generated from all feature plans. Last updated: 2026-03-25
 
 ## Active Technologies
 - JavaScript — Node.js 20 LTS (main process), React 18 (renderer) + Electron 30 via `electron-vite`, `react-resizable-panels` v2 (resizable divider), `react-markdown` + `remark-gfm` + `rehype-pretty-code` + `shiki` (preview rendering, reused from spec 001), `electron-store` (no new schema changes) (003-split-view-preview)
@@ -16,6 +16,9 @@ Auto-generated from all feature plans. Last updated: 2026-03-17
 - JavaScript (ES2022), React 18.3, JSX + Electron 34, electron-vite, React 18, react-resizable-panels, CSS Modules (007-file-tree-sidebar)
 - `electron-store` — extend `ui.sidebar` schema with `rootFolderPath: string | null` (007-file-tree-sidebar)
 - No new storage. E2E state injected into `localStorage` via `page.evaluate()` using the `dinomd:docs` / `dinomd:ui` keys already defined by `browserApi.js`. (009-vitest-playwright-testing)
+- JavaScript — Node.js 20 LTS (main process), React 18 (renderer) + Electron 34 via `electron-vite`, React 18, existing `shiki`/`rehype-pretty-code` (unchanged), existing `markdownTokenizer.js` (reused for token logic), `html2canvas` v1.4 (new — client-side DOM-to-PNG) (010-code-snapshot-export)
+- No new storage — snapshot mode is transient `useState`; no IPC, no `electron-store` changes (010-code-snapshot-export)
+- N/A — no persistence; all state is transient React state in the renderer (010-code-snapshot-export)
 
 - JavaScript — Node.js 20 LTS (main process), React 18 (renderer) + Electron 30 via `electron-vite`, `@dnd-kit/core` + `@dnd-kit/sortable`, `react-markdown` + `remark-gfm` + `rehype-pretty-code` + `shiki`, `electron-store` (001-dinomd-markdown-reader)
 
@@ -37,9 +40,9 @@ JavaScript — Node.js 20 LTS (main process), React 18 (renderer): Follow standa
 - Do not add comments about argument types, return types, or side effects — these should be clear from the code itself
 
 ## Recent Changes
+- 010-code-snapshot-export: Added JavaScript (ES2022), React 18.3, JSX
+- 010-code-snapshot-export: Added JavaScript — Node.js 20 LTS (main process), React 18 (renderer) + Electron 34 via `electron-vite`, React 18, existing `shiki`/`rehype-pretty-code` (unchanged), existing `markdownTokenizer.js` (reused for token logic), `html2canvas` v1.4 (new — client-side DOM-to-PNG)
 - 009-vitest-playwright-testing: Added JavaScript (ES2022), React 18.3, JSX
-- 007-file-tree-sidebar: Added JavaScript (ES2022), React 18.3, JSX + Electron 34, electron-vite, React 18, react-resizable-panels, CSS Modules
-- 006-editor-ui-refinements: Added JavaScript (ES2022), React 18.3, JSX + Electron 34, electron-vite, React 18, react-markdown 9, shiki 1.24 (already used in MarkdownViewer), CSS Modules
 
 
 <!-- MANUAL ADDITIONS START -->

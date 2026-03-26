@@ -1,4 +1,3 @@
-````skill
 ---
 name: jest-testing-standards
 description: Guide for writing tests in this project. Use this whenever creating, editing, or reviewing test files for main-process or renderer code.

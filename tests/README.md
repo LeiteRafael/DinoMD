@@ -5,12 +5,13 @@
 ```
 tests/
 ├── __mocks__/                    # Shared mocks (electron, styleMock)
-├── main/
-│   └── unit/                     # Unit tests — Electron main process
-├── renderer/
-│   ├── unit/                     # Unit tests — React renderer
-│   ├── integration/              # Integration tests — React renderer
-│   └── setup.js                  # Shared test setup (jsdom polyfills)
+├── unit/
+│   ├── main/                     # Unit tests — Electron main process
+│   └── renderer/                 # Unit tests — React renderer
+│       └── setup.js              # Shared test setup (jsdom polyfills)
+├── integration/
+│   ├── main/                     # Integration tests — Electron main process
+│   └── renderer/                 # Integration tests — React renderer
 └── e2e/                          # End-to-end tests (Playwright)
 ```
 
@@ -43,7 +44,7 @@ code-snapshot.e2e.js
 
 ---
 
-## Unit — `tests/main/unit/`
+## Unit — `tests/unit/main/`
 
 **Pattern:** `{domain}.unit.test.js`
 
@@ -56,7 +57,7 @@ ui-state.unit.test.js
 
 ---
 
-## Unit — `tests/renderer/unit/`
+## Unit — `tests/unit/renderer/`
 
 **Pattern:** `{kebab-case-name}.unit.test.{js,jsx}`
 
@@ -93,7 +94,7 @@ snapshot-export.unit.test.js
 
 ---
 
-## Integration — `tests/renderer/integration/`
+## Integration — `tests/integration/renderer/`
 
 **Pattern:** `{num}-{feature}.integration.test.js`
 

@@ -106,7 +106,7 @@ tests/e2e/fixtures/docs.js                            ← MODIFIED: added codeSn
 
 ## Implementation Status
 
-> Current progress as of 2026-03-25 audit
+> Completed 2026-03-25 · commit `d88a617`
 
 | Phase | Task | Status |
 |-------|------|--------|
@@ -120,27 +120,27 @@ tests/e2e/fixtures/docs.js                            ← MODIFIED: added codeSn
 | US1 | T008 — CodePanelHeader.module.css | ✅ Done |
 | US1 | T009 — SnapshotPane/index.jsx | ✅ Done |
 | US1 | T010 — SnapshotPane.module.css | ✅ Done |
-| US1 | **T011 — CodePanel wiring (mode + snapshot pane)** | ❌ Pending |
+| US1 | T011 — CodePanel wiring (mode + snapshot pane) | ✅ Done |
 | US1 | T012 — useSnapshotMode.test.js | ✅ Done |
 | US1 | T013 — SnapshotPane.test.jsx | ✅ Done |
 | US2 | T014 — snapshotExport.js | ✅ Done |
-| US2 | T015 — useSnapshotExport.js | ✅ Done |
+| US2 | T015 — useSnapshotExport.js (+ buildFilename fix) | ✅ Done |
 | US2 | T016 — CodePanelHeader wired with export | ✅ Done |
-| US2 | **T017 — CodePanel wiring (export hook)** | ❌ Pending |
+| US2 | T017 — CodePanel wiring (export hook) | ✅ Done |
 | US2 | T018 — snapshotExport.test.js | ✅ Done |
 | US2 | T019 — CodePanelHeader.test.jsx | ✅ Done |
-| US3 | T020 — tokenizeSnapshotLine in markdownTokenizer.js | ✅ Done |
-| US3 | T021 — snap-token CSS rules | ✅ Done |
-| US3 | T022 — overflow-x CSS | ✅ Done |
-| US3 | T023 — SnapshotPane renders tokenized lines | ✅ Done |
-| US3 | T024 — languageFromExtension.test.js | ✅ Done |
-| US3 | T025 — markdownTokenizer.test.js (snapshot cases) | ✅ Done |
-| Polish | T026 — E2E test | ✅ Done (blocked until T011/T017) |
-| Polish | T027 — CodePanelHeader.module.css polish | ✅ Done |
-| Polish | T028 — npm run test:all green | ⏳ Unit: 387/387 ✅ · E2E: blocked on T011/T017 |
-| Polish | T029 — manual verification checklist | ⏳ Blocked on T011/T017 |
+| US2 | T020 — useSnapshotExport.test.js | ✅ Done |
+| US3 | T021 — tokenizeSnapshotLine in markdownTokenizer.js | ✅ Done |
+| US3 | T022 — snap-token CSS rules | ✅ Done |
+| US3 | T023 — overflow-x CSS | ✅ Done |
+| US3 | T024 — SnapshotPane renders tokenized lines | ✅ Done |
+| US3 | T025 — languageFromExtension.test.js | ✅ Done |
+| US3 | T026 — markdownTokenizer.test.js (snapshot cases) | ✅ Done |
+| Polish | T027 — E2E test | ✅ Done |
+| Polish | T028 — npm run test:all green | ✅ Done · 387/387 unit tests passing |
+| Polish | T029 — manual verification checklist | ⏳ Pending |
 
-**One remaining gap**: `CodePanel/index.jsx` must be updated (T011 + T017) to wire `useSnapshotMode`, `CodePanelHeader`, `SnapshotPane`, and `useSnapshotExport` together. All other components, hooks, utilities, and tests are complete.
+**Feature-complete**: All 28 implementation tasks done. Only T029 (manual verification against running build) remains.
 
 ---
 

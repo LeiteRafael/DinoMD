@@ -6,7 +6,7 @@ export default defineWorkspace([
         test: {
             name: 'main',
             environment: 'node',
-            include: ['tests/main/**/*.test.js'],
+            include: ['tests/main/unit/**/*.test.js'],
             globals: true,
             pool: 'vmForks',
         },
@@ -21,7 +21,10 @@ export default defineWorkspace([
         test: {
             name: 'renderer',
             environment: 'jsdom',
-            include: ['tests/renderer/**/*.test.{js,jsx}'],
+            include: [
+                'tests/renderer/unit/**/*.test.{js,jsx}',
+                'tests/renderer/integration/**/*.test.{js,jsx}',
+            ],
             globals: true,
             setupFiles: ['tests/renderer/setup.js', '@testing-library/jest-dom'],
         },

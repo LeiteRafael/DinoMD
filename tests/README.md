@@ -22,28 +22,23 @@ tests/
 |-------------|--------------------------------------------|------------------------------------------|
 | Unit        | `{kebab-case-name}.unit.test.{js,jsx}`     | `document-card.unit.test.js`             |
 | Integration | `{num}-{feature}.integration.test.js`      | `001-import-view.integration.test.js`    |
-| E2E         | `{num}-{feature}.e2e.js`                   | `001-import-view.e2e.js`                 |
+| E2E         | `{responsibility}.e2e.js`                  | `documents.e2e.js`                       |
 
 All unit test files use **kebab-case** and include a `.unit` type suffix.
 Integration tests keep their numeric prefix for ordering and include `.integration`.
-E2E tests follow the same numeric prefix pattern with `.e2e`.
+E2E tests are grouped by responsibility using **kebab-case** with `.e2e`.
 
 ---
 
 ## E2E — `tests/e2e/`
 
-**Pattern:** `{num}-{feature}.e2e.js`
+**Pattern:** `{responsibility}.e2e.js`
 
 ```
-001-import-view.e2e.js
-002-create-edit.e2e.js
-003-split-view.e2e.js
-004-file-browser.e2e.js
-005-enhanced-editor.e2e.js
-006-ui-refinements.e2e.js
-007-file-tree.e2e.js
-008-copy-save.e2e.js
-010-code-snapshot.e2e.js
+documents.e2e.js
+editor.e2e.js
+file-tree.e2e.js
+code-snapshot.e2e.js
 ```
 
 ---

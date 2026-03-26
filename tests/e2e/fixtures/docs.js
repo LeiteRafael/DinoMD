@@ -1,35 +1,22 @@
 export const traceabilityIndex = {
-    '001': {
-        spec: 'DinoMD Markdown Reader',
-        file: '001-import-view.e2e.js',
-        fixtures: ['headingsDoc', 'codeBlocksDoc', 'listsDoc'],
+    documents: {
+        spec: 'Document management — listing, navigation, creation, and persistence',
+        file: 'documents.e2e.js',
+        fixtures: ['headingsDoc', 'fileBrowserDoc', 'copyDoc'],
     },
-    '002': { spec: 'Create & Edit', file: '002-create-edit.e2e.js', fixtures: ['editContentDoc'] },
-    '003': {
-        spec: 'Split View Preview',
-        file: '003-split-view.e2e.js',
-        fixtures: ['splitViewDoc'],
+    editor: {
+        spec: 'Editor — editing, split view, and UI modes',
+        file: 'editor.e2e.js',
+        fixtures: ['splitViewDoc', 'editorDoc'],
     },
-    '004': {
-        spec: 'File Browser Sidebar',
-        file: '004-file-browser.e2e.js',
-        fixtures: ['fileBrowserDoc'],
+    'file-tree': {
+        spec: 'File tree — sidebar and folder browsing',
+        file: 'file-tree.e2e.js',
+        fixtures: [],
     },
-    '005': {
-        spec: 'Enhanced Markdown Editor',
-        file: '005-enhanced-editor.e2e.js',
-        fixtures: ['editorDoc'],
-    },
-    '006': {
-        spec: 'Editor UI Refinements',
-        file: '006-ui-refinements.e2e.js',
-        fixtures: ['splitViewDoc'],
-    },
-    '007': { spec: 'File Tree Sidebar', file: '007-file-tree.e2e.js', fixtures: [] },
-    '008': { spec: 'Copy & Save Shortcuts', file: '008-copy-save.e2e.js', fixtures: ['copyDoc'] },
-    '010': {
-        spec: 'Code Snapshot Export',
-        file: '010-code-snapshot.e2e.js',
+    'code-snapshot': {
+        spec: 'Code snapshot — snapshot mode and export',
+        file: 'code-snapshot.e2e.js',
         fixtures: ['codeSnapshotDoc'],
     },
 }

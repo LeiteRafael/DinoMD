@@ -1,5 +1,8 @@
 # DinoMD
 
+<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/aced24ad-0aad-4ac2-b34c-4d67c7597a25" />
+
+
 A lightweight and friendly Markdown reader desktop app. Simple, fast, and prehistoric.
 
 Built with **Electron**, **React 18**, and **Vite** via `electron-vite`.

@@ -1,6 +1,8 @@
 # DinoMD
 
-<img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/aced24ad-0aad-4ac2-b34c-4d67c7597a25" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/aced24ad-0aad-4ac2-b34c-4d67c7597a25" width="512"/>
+</p>
 
 
 A lightweight and friendly Markdown reader desktop app. Simple, fast, and prehistoric.

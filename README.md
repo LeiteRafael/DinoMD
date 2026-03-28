@@ -1,7 +1,7 @@
 # DinoMD
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/aced24ad-0aad-4ac2-b34c-4d67c7597a25" width="512"/>
+  <img src="https://github.com/user-attachments/assets/79396269-8ede-41a4-9fe4-79dd4b62f83a" width="512"/>
 </p>
 
 <p align="center"> A lightweight and friendly Markdown reader desktop app. Simple, fast, and prehistoric. <br/><br/> Built with <b>Electron</b>, <b>React 18</b>, and <b>Vite</b> via <code>electron-vite</code>. </p> <p align="center"> <img src="https://img.shields.io/github/stars/LeiteRafael/DinoMD?style=social" alt="GitHub stars"/> <img src="https://img.shields.io/github/license/LeiteRafael/DinoMD" alt="License"/> <img src="https://img.shields.io/github/last-commit/LeiteRafael/DinoMD" alt="Last commit"/> <img src="https://img.shields.io/github/repo-size/LeiteRafael/DinoMD" alt="Repo size"/> <img src="https://img.shields.io/github/issues/LeiteRafael/DinoMD" alt="Issues"/> <img src="https://img.shields.io/badge/Electron-Desktop-blue?logo=electron" alt="Electron"/> <img src="https://img.shields.io/badge/React-18-blue?logo=react" alt="React"/> <img src="https://img.shields.io/badge/Vite-Build-purple?logo=vite" alt="Vite"/> </p>

@@ -123,6 +123,7 @@ export default function SplitViewPage({ editorHook, onBack, onDocumentSaved }) {
             documentId={session.documentId}
             documentName={session.name}
             filePath={session.filePath}
+            savedContent={session.savedContent}
         />
     )
     const previewPane = (

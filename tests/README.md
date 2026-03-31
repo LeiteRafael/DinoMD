@@ -4,13 +4,11 @@
 
 ```
 tests/
-├── __mocks__/                    # Shared mocks (electron, styleMock)
+├── __mocks__/                    # Shared mocks (styleMock)
 ├── unit/
-│   ├── main/                     # Unit tests — Electron main process
 │   └── renderer/                 # Unit tests — React renderer
 │       └── setup.js              # Shared test setup (jsdom polyfills)
 ├── integration/
-│   ├── main/                     # Integration tests — Electron main process
 │   └── renderer/                 # Integration tests — React renderer
 └── e2e/                          # End-to-end tests (Playwright)
 ```
@@ -40,19 +38,6 @@ documents.e2e.js
 editor.e2e.js
 file-tree.e2e.js
 code-snapshot.e2e.js
-```
-
----
-
-## Unit — `tests/unit/main/`
-
-**Pattern:** `{domain}.unit.test.js`
-
-```
-documents.unit.test.js
-documents-edit.unit.test.js
-folder.unit.test.js
-ui-state.unit.test.js
 ```
 
 ---
@@ -110,3 +95,4 @@ snapshot-export.unit.test.js
 009-reader-page.integration.test.js
 011-app.integration.test.js
 ```
+

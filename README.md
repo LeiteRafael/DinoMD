@@ -4,7 +4,8 @@
   <img src="https://github.com/user-attachments/assets/79396269-8ede-41a4-9fe4-79dd4b62f83a" width="512"/>
 </p>
 
-<p align="center"> A lightweight and friendly Markdown reader desktop app. Simple, fast, and prehistoric. <br/><br/> Built with <b>Electron</b>, <b>React 18</b>, and <b>Vite</b> via <code>electron-vite</code>. </p> <p align="center"> <img src="https://img.shields.io/github/stars/LeiteRafael/DinoMD?style=social" alt="GitHub stars"/> <img src="https://img.shields.io/github/license/LeiteRafael/DinoMD" alt="License"/>  <img src="https://img.shields.io/github/last-commit/LeiteRafael/DinoMD" alt="Last commit"/> <img src="https://img.shields.io/github/repo-size/LeiteRafael/DinoMD" alt="Repo size"/> <img src="https://img.shields.io/github/issues/LeiteRafael/DinoMD" alt="Issues"/> <img src="https://img.shields.io/badge/Electron-Desktop-blue?logo=electron" alt="Electron"/> <img src="https://img.shields.io/badge/React-18-blue?logo=react" alt="React"/> <img src="https://img.shields.io/badge/Vite-Build-purple?logo=vite" alt="Vite"/> </p>
+<p align="center"> A lightweight and friendly Markdown reader web app. Simple, fast, and prehistoric. <br/><br/>
+Built with <b>React 18</b> and <b>Vite</b>. </p> <p align="center"> <img src="https://img.shields.io/github/stars/LeiteRafael/DinoMD?style=social" alt="GitHub stars"/> <img src="https://img.shields.io/github/license/LeiteRafael/DinoMD" alt="License"/>  <img src="https://img.shields.io/github/last-commit/LeiteRafael/DinoMD" alt="Last commit"/> <img src="https://img.shields.io/github/repo-size/LeiteRafael/DinoMD" alt="Repo size"/> <img src="https://img.shields.io/github/issues/LeiteRafael/DinoMD" alt="Issues"/> <img src="https://img.shields.io/badge/React-18-blue?logo=react" alt="React"/> <img src="https://img.shields.io/badge/Vite-Build-purple?logo=vite" alt="Vite"/> </p>
 
 ---
 
@@ -14,9 +15,8 @@
 - **Reader view** — clean, styled Markdown rendering with syntax highlighting (Shiki) and GFM support
 - **Editor view** — in-app Markdown editor with live debounce saving
 - **Split view** — side-by-side editor and preview with synchronized scrolling
-- **File tree sidebar** — browse and open any folder from disk; detects external file changes
-- **Persistent state** — document list and sidebar state are saved between sessions via `electron-store`
-- **Web mode** — runs as a plain browser app (without Electron) for development and testing
+- **File tree sidebar** — browse and open any folder from disk via the File System Access API
+- **Persistent state** — document list and sidebar state are saved between sessions via `localStorage`
 
 ---
 
@@ -24,16 +24,6 @@
 
 ```
 ┌─────────────────────────────────────────────┐
-│                Electron Main                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │documents │  │  folder  │  │    ui    │   │  ← IPC handlers
-│  └──────────┘  └──────────┘  └──────────┘   │
-│  ┌──────────────────────────────────────┐   │
-│  │  electron-store  │  fs/fileUtils     │   │
-│  └──────────────────────────────────────┘   │
-└────────────────────┬────────────────────────┘
-                     │ contextBridge (window.api)
-┌────────────────────▼────────────────────────┐
 │              React Renderer                 │
 │  Pages: MainPage · ReaderPage               │
 │          EditorPage · SplitViewPage         │
@@ -45,14 +35,7 @@
 └─────────────────────────────────────────────┘
 ```
 
-**IPC channels exposed via preload:**
-
-| Namespace | Channels |
-|---|---|
-| `documents` | `import-files`, `get-all`, `reorder`, `read-content`, `remove`, `create`, `save`, `rename`, `delete` |
-| `folder` | `open-picker`, `read-dir`, `read-file`, `write-file` |
-| `ui` | `get-sidebar-state`, `set-sidebar-state` |
-| event | `file:changed-externally` |
+The browser `window.api` surface is provided by `src/web/browserApi.js`, which uses `localStorage` for document persistence and the **File System Access API** for folder browsing.
 
 ---
 
@@ -60,25 +43,18 @@
 
 ```
 src/
-├── main/               # Electron main process
-│   ├── index.js        # App entry point, BrowserWindow setup
-│   ├── ipc/            # IPC handler registration (documents, folder, ui)
-│   ├── fs/             # File system utilities
-│   └── store/          # electron-store persistence layer
-├── preload/
-│   └── index.js        # contextBridge API exposed to renderer
-├── renderer/           # React app (Electron target)
+├── renderer/           # React app
 │   └── src/
 │       ├── App.jsx
 │       ├── pages/      # MainPage, ReaderPage, EditorPage, SplitViewPage
 │       ├── components/ # Sidebar, MarkdownViewer, MarkdownEditor, Toast …
 │       ├── hooks/      # useDocuments, useEditor, useSidebar, useFileTree …
-│       ├── services/   # api.js — wraps window.api with browser fallbacks
+│       ├── services/   # api.js — wraps window.api
 │       └── utils/      # clipboardUtils, markdownTokenizer
-└── web/                # Browser-only entry point (no Electron)
+└── web/                # Browser entry point
     ├── index.html
     ├── main.jsx
-    └── browserApi.js   # Mock of window.api for browser mode
+    └── browserApi.js   # window.api implementation for browser
 ```
 
 ---
@@ -96,33 +72,24 @@ src/
 npm install
 ```
 
-### Run in development (Electron)
+### Run in development
 
 ```bash
 npm run dev
 ```
 
-### Run in development (browser only)
-
-```bash
-npm run dev:web
-```
-
-Opens at `http://localhost:5174` — no Electron required, useful for fast UI iteration.
+Opens at `http://localhost:5174`.
 
 ---
 
 ## Build
 
 ```bash
-# Electron app
+# Web bundle
 npm run build
 
-# Web-only bundle
-npm run build:web
-
 # Preview built web bundle
-npm run preview:web
+npm run preview
 ```
 
 ---
@@ -182,31 +149,26 @@ npx playwright install chromium
 
 ```
 tests/
-├── __mocks__/          # Shared mocks (electron, styleMock)
-├── main/               # Unit tests — Electron main process (Vitest)
-├── renderer/           # Unit + integration tests — React renderer (Vitest + RTL)
+├── __mocks__/          # Shared mocks (styleMock)
+├── unit/
+│   └── renderer/       # Unit tests — React renderer (Vitest + RTL)
+├── integration/
+│   └── renderer/       # Integration tests — React renderer (Vitest + RTL)
 └── e2e/                # End-to-end tests (Playwright)
 ```
 
-#### E2E — `tests/e2e/` — pattern: `{num}-{feature}.e2e.js`
+#### E2E — `tests/e2e/` — pattern: `{responsibility}.e2e.js`
 
-Full user flows executed against the running Electron app via Playwright.
-
-#### Unit — `tests/main/` — pattern: `{domain}.test.js`
-
-Isolated tests for IPC handlers and store logic; Electron APIs are mocked.
+Full user flows executed against the running web app via Playwright.
 
 #### Unit + Integration — `tests/renderer/`
 
-Two patterns coexist:
-
 | Pattern | Type | Examples |
 |---|---|---|
-| `PascalCase.test.js` | unit — React components | `DocumentCard.test.js` |
-| `camelCase.test.js` | unit — hooks / utils | `useDebounce.test.js` |
+| `{kebab-case}.unit.test.{js,jsx}` | unit — React components / hooks | `document-card.unit.test.js` |
 | `{num}-{feature}.integration.test.js` | integration — full page render | `001-import-view.integration.test.js` |
 
-> See [`tests/README.md`](tests/README.md) for a detailed naming analysis and proposed improvements.
+> See [`tests/README.md`](tests/README.md) for a detailed naming analysis.
 
 ### Coverage thresholds
 
@@ -228,8 +190,7 @@ Playwright test reports are written to:
 
 | Package | Role |
 |---|---|
-| `electron` | Desktop shell |
-| `electron-vite` | Build tooling for Electron + Vite |
+| `vite` | Build tooling |
 | `react` / `react-dom` | UI framework |
 | `react-markdown` | Markdown rendering |
 | `rehype-pretty-code` + `shiki` | Syntax highlighting |
@@ -237,5 +198,5 @@ Playwright test reports are written to:
 | `remark-frontmatter` | YAML frontmatter parsing |
 | `@dnd-kit/*` | Drag-and-drop for document reordering |
 | `react-resizable-panels` | Resizable split view |
-| `electron-store` | Persistent key-value storage |
 | `uuid` | Document ID generation |
+

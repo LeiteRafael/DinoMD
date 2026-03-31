@@ -3,15 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineWorkspace([
     {
-        test: {
-            name: 'main',
-            environment: 'node',
-            include: ['tests/unit/main/**/*.test.js'],
-            globals: true,
-            pool: 'vmForks',
-        },
-    },
-    {
         plugins: [react()],
         css: {
             modules: {

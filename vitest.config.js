@@ -1,9 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'url'
 import { transform as esbuildTransform } from 'esbuild'
-
-const electronMockPath = fileURLToPath(new URL('./tests/__mocks__/electron.js', import.meta.url))
 
 function jsxInJsPlugin() {
     return {
@@ -25,19 +22,6 @@ function jsxInJsPlugin() {
 export default defineConfig({
     test: {
         projects: [
-            {
-                resolve: {
-                    alias: {
-                        electron: electronMockPath,
-                    },
-                },
-                test: {
-                    name: 'main',
-                    environment: 'node',
-                    include: ['tests/unit/main/**/*.test.js'],
-                    globals: true,
-                },
-            },
             {
                 plugins: [jsxInJsPlugin(), react()],
                 test: {
@@ -64,13 +48,10 @@ export default defineConfig({
         ],
         coverage: {
             provider: 'v8',
-            include: ['src/main/**', 'src/preload/**', 'src/renderer/src/**'],
+            include: ['src/renderer/src/**', 'src/web/**'],
             exclude: [
                 'src/renderer/src/main.jsx',
-                'src/main/index.js',
-                'src/preload/index.js',
-                'src/main/fs/fileUtils.js',
-                'src/main/store/index.js',
+                'src/web/main.jsx',
                 '**/__mocks__/**',
                 '**/node_modules/**',
             ],

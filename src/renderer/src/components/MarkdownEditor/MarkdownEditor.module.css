@@ -18,6 +18,9 @@
     padding-top: 1.5rem;
     flex-shrink: 0;
     user-select: none;
+    --color-indicator-added: #2da44e;
+    --color-indicator-modified: #d29922;
+    --color-indicator-deleted: #da3633;
 }
 
 .gutterInner {
@@ -32,6 +35,27 @@
     line-height: var(--editor-line-height, 1.6);
     display: block;
     white-space: pre;
+    position: relative;
+}
+
+.changeIndicator {
+    width: 3px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.indicatorAdded {
+    background: var(--color-indicator-added);
+}
+
+.indicatorModified {
+    background: var(--color-indicator-modified);
+}
+
+.indicatorDeleted {
+    background: var(--color-indicator-deleted);
 }
 
 .gutterActiveLine {
@@ -53,10 +77,35 @@
     position: absolute;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.12);
-    border-left: 3px solid var(--color-border);
+    background: transparent;
+    border-left: 2px solid #8d6a40;
     pointer-events: none;
     z-index: 0;
+}
+
+.codeBlockBackground::before,
+.codeBlockBackground::after {
+    content: 'code';
+    position: absolute;
+    left: 1px;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #8f6533;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1;
+}
+
+.codeBlockBackground::before {
+    top: 0;
+    transform: translateY(-50%);
+}
+
+.codeBlockBackground::after {
+    bottom: 0;
+    transform: translateY(50%);
 }
 
 .activeLineHighlight {

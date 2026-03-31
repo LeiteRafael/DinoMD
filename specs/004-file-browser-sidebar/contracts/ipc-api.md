@@ -23,6 +23,8 @@ Reads the persisted sidebar configuration from `electron-store`.
 
 **Response**:
 
+### Teste de diff
+
 ```json
 {
   "open": true,

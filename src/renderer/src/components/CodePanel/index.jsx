@@ -17,6 +17,7 @@ const CodePanel = ({
     documentId,
     documentName,
     filePath,
+    savedContent,
 }) => {
     const { mode, setMode } = useSnapshotMode(documentId)
     const snapshotFrameRef = useRef(null)
@@ -42,6 +43,7 @@ const CodePanel = ({
                     onDiscard={onDiscard}
                     containerRef={containerRef}
                     onScroll={onScroll}
+                    savedContent={savedContent}
                 />
             )}
         </div>

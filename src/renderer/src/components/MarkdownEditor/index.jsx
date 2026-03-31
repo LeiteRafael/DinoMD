@@ -1,15 +1,30 @@
 import { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react'
 import { tokenize } from '../../utils/markdownTokenizer'
+import useChangeIndicators from '../../hooks/useChangeIndicators'
 import styles from './MarkdownEditor.module.css'
+const INDICATOR_VARIANTS = {
+    added: { className: styles.indicatorAdded, label: 'Added line' },
+    modified: { className: styles.indicatorModified, label: 'Modified line' },
+    deleted: { className: styles.indicatorDeleted, label: 'Deleted line' },
+}
+
 const INITIAL_LINE_HEIGHT_PX = 24.32
 const PADDING_TOP_REM = 1.5
-export default function MarkdownEditor({ value, onChange, placeholder, textareaRef, onScroll }) {
+export default function MarkdownEditor({
+    value,
+    onChange,
+    placeholder,
+    textareaRef,
+    onScroll,
+    savedContent,
+}) {
     const [activeLine, setActiveLine] = useState(1)
     const [scrollTop, setScrollTop] = useState(0)
     const [localValue, setLocalValue] = useState(value)
     const [lineHeightPx, setLineHeightPx] = useState(INITIAL_LINE_HEIGHT_PX)
     const preRef = useRef(null)
     const sizerRef = useRef(null)
+    const { changeMap } = useChangeIndicators(localValue, savedContent ?? '')
     useEffect(() => {
         setLocalValue(value)
     }, [value])
@@ -43,14 +58,26 @@ export default function MarkdownEditor({ value, onChange, placeholder, textareaR
                 {
                     length: lineCount,
                 },
-                (_, i) => (
-                    <div key={i} className={styles.lineNumber}>
-                        {i + 1}
-                        {'\u200B'}
-                    </div>
-                )
+                (_, i) => {
+                    const lineNumber = i + 1
+                    const changeType = changeMap.get(lineNumber)
+                    const variant = changeType ? INDICATOR_VARIANTS[changeType] : null
+                    return (
+                        <div key={i} className={styles.lineNumber}>
+                            {variant && (
+                                <span
+                                    className={`${styles.changeIndicator} ${variant.className}`}
+                                    title={variant.label}
+                                    aria-label={variant.label}
+                                />
+                            )}
+                            {lineNumber}
+                            {'\u200B'}
+                        </div>
+                    )
+                }
             ),
-        [lineCount]
+        [lineCount, changeMap]
     )
     const activeLineTop = `calc(${PADDING_TOP_REM}rem + ${(activeLine - 1) * lineHeightPx}px - ${scrollTop}px)`
     const activeLineStyle = { top: activeLineTop, height: `${lineHeightPx}px` }

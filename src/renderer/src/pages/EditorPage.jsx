@@ -307,6 +307,7 @@ export default function EditorPage({
                     key={session.documentId ?? session.filePath ?? 'draft'}
                     value={session.content}
                     onChange={updateContent}
+                    savedContent={session.savedContent}
                 />
             </main>
 

@@ -3,11 +3,16 @@ import { api } from '../services/api.js'
 
 export default function useMarkdown(documentId) {
     const [rawMarkdown, setRawMarkdown] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
     useEffect(() => {
-        if (!documentId) return
+        if (!documentId) {
+            setLoading(false)
+            setError(null)
+            setRawMarkdown(null)
+            return
+        }
 
         let cancelled = false
 

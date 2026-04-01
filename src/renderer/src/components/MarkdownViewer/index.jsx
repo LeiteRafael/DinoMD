@@ -55,7 +55,7 @@ function CodeBlock({ className, children }) {
         codeToHtml(code, { lang: rawLanguage, theme: 'github-dark' })
             .then(setHtml)
             .catch(() => {
-                setHtml(`<pre data-language="${rawLanguage}"><code>${code}</code></pre>`)
+                setHtml('')
             })
     }, [isBlock, code, rawLanguage])
 

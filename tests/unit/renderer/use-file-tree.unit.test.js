@@ -104,6 +104,18 @@ describe('useFileTree — initial root loading', () => {
         expect(result.current.rootEntries).toHaveLength(0)
     })
 
+    test('sets error state when readDir rejects', async () => {
+        api.folder.readDir.mockRejectedValue(new Error('Disk unavailable'))
+
+        const { result } = renderHook(() => useFileTree({ initialRootFolderPath: ROOT }))
+
+        await act(async () => {})
+
+        expect(result.current.error).toBe('Disk unavailable')
+        expect(result.current.loading).toBe(false)
+        expect(result.current.rootEntries).toHaveLength(0)
+    })
+
     test('resets expandedPaths when rootFolderPath changes', async () => {
         api.folder.openPicker.mockResolvedValue(ROOT)
         api.folder.readDir.mockResolvedValueOnce(ROOT_ENTRIES).mockResolvedValue(DOCS_ENTRIES)
@@ -187,5 +199,20 @@ describe('useFileTree — toggleFolder', () => {
         })
 
         expect(api.folder.readDir.mock.calls.length).toBe(callCountAfterDoubleToggle)
+    })
+
+    test('toggleFolder handles readDir rejection by clearing loading state for the node', async () => {
+        api.folder.readDir.mockResolvedValueOnce(ROOT_ENTRIES).mockRejectedValueOnce(new Error('No access'))
+
+        const { result } = renderHook(() => useFileTree({ initialRootFolderPath: ROOT }))
+        await act(async () => {})
+
+        await act(async () => {
+            await result.current.toggleFolder(`${ROOT}/docs`, null)
+        })
+
+        const docsNode = result.current.rootEntries.find((entry) => entry.path === `${ROOT}/docs`)
+        expect(docsNode?.loadingChildren).toBe(false)
+        expect(docsNode?.children).toEqual([])
     })
 })

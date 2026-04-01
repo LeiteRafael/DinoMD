@@ -44,16 +44,25 @@ export default function useFileTree({ initialRootFolderPath = null, onRootFolder
         setError(null)
         setExpandedPaths(new Set())
 
-        api.folder.readDir(rootFolderPath).then((result) => {
-            if (cancelled) return
-            if (result && result.error) {
-                setError(result.error)
+        api.folder
+            .readDir(rootFolderPath)
+            .then((result) => {
+                if (cancelled) return
+                if (result && result.error) {
+                    setError(result.error)
+                    setRootEntries([])
+                } else {
+                    setRootEntries(buildTreeNodes(result, 0))
+                }
+            })
+            .catch((err) => {
+                if (cancelled) return
+                setError(err?.message ?? 'Failed to read folder')
                 setRootEntries([])
-            } else {
-                setRootEntries(buildTreeNodes(result, 0))
-            }
-            setLoading(false)
-        })
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false)
+            })
 
         return () => {
             cancelled = true
@@ -82,10 +91,15 @@ export default function useFileTree({ initialRootFolderPath = null, onRootFolder
 
         setRootEntries((prev) => updateNodeLoadingState(prev, nodePath, true))
 
-        api.folder.readDir(nodePath).then((result) => {
-            const children = result && result.error ? [] : buildTreeNodes(result, 0)
-            setRootEntries((prev) => updateNodeChildren(prev, nodePath, children))
-        })
+        api.folder
+            .readDir(nodePath)
+            .then((result) => {
+                const children = result && result.error ? [] : buildTreeNodes(result, 0)
+                setRootEntries((prev) => updateNodeChildren(prev, nodePath, children))
+            })
+            .catch(() => {
+                setRootEntries((prev) => updateNodeChildren(prev, nodePath, []))
+            })
     }, [])
 
     return {

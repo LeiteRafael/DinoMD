@@ -177,4 +177,15 @@ describe('MarkdownViewer', () => {
             expect.objectContaining({ lang: 'py' })
         )
     })
+
+    test('falls back safely when syntax highlighting fails', async () => {
+        codeToHtml.mockRejectedValueOnce(new Error('boom'))
+
+        await act(async () => {
+            render(<MarkdownViewer rawMarkdown={'```html\n<img src=x onerror=alert(1)>\n```'} />)
+        })
+
+        expect(screen.getByText('<img src=x onerror=alert(1)>')).toBeInTheDocument()
+        expect(document.querySelector('img')).not.toBeInTheDocument()
+    })
 })

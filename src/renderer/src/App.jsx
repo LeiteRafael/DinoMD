@@ -109,17 +109,21 @@ export default function App() {
                         title="Open sidebar"
                         aria-label="Open sidebar"
                         style={{
-                            alignSelf: 'flex-start',
-                            margin: '8px 0 0 8px',
-                            background: 'transparent',
+                            alignSelf: 'stretch',
+                            width: '36px',
+                            background: 'linear-gradient(180deg, #1c1f26 0%, #181b22 100%)',
                             border: 'none',
+                            borderRight: '1px solid #2e3440',
                             cursor: 'pointer',
-                            fontSize: '18px',
-                            color: '#a6adc8',
+                            fontSize: '16px',
+                            color: '#b7bdd5',
                             flexShrink: 0,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            paddingTop: '12px',
                         }}
                     >
-                        ›
+                        <span className="material-icons">right_panel_open</span>
                     </button>
                     <div
                         style={{

@@ -2,8 +2,8 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: #1e1e2e;
-    border-right: 1px solid #313244;
+    background: linear-gradient(180deg, #1c1f26 0%, #181b22 100%);
+    border-right: 1px solid #2e3440;
     overflow: hidden;
 }
 
@@ -13,17 +13,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 10px 8px;
+    padding: 12px 12px 10px;
     flex-shrink: 0;
-    border-bottom: 1px solid #313244;
+    border-bottom: 1px solid #2e3440;
+}
+
+.headerMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
 }
 
 .headerTitle {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #a6adc8;
+    color: #b7bdd5;
+    user-select: none;
+}
+
+.headerSubtitle {
+    font-size: 11px;
+    color: #7d849f;
     user-select: none;
 }
 
@@ -35,46 +47,75 @@
 
 .newDocButton,
 .toggleButton {
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
     cursor: pointer;
-    color: #a6adc8;
-    font-size: 18px;
+    color: #b7bdd5;
+    font-size: 16px;
     line-height: 1;
-    padding: 2px 6px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition:
         background 0.15s ease,
-        color 0.15s ease;
+        color 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .newDocButton:hover,
 .toggleButton:hover {
-    background: #313244;
-    color: #cdd6f4;
+    background: #31394a;
+    color: #e6e9f6;
+    border-color: #4a5164;
+}
+
+.newDocButton:focus-visible,
+.toggleButton:focus-visible,
+.openFolderButton:focus-visible,
+.searchInput:focus-visible,
+.entry:focus-visible,
+.treeRow:focus-visible,
+.openFolderCta:focus-visible {
+    outline: 2px solid #89b4fa;
+    outline-offset: 1px;
 }
 
 /* ── Search ─────────────────────────────────────────────────────────────────── */
 
 .searchWrapper {
-    padding: 8px 10px;
+    padding: 10px;
     flex-shrink: 0;
+}
+
+.searchField {
+    position: relative;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #79819c;
 }
 
 .searchInput {
     width: 100%;
     box-sizing: border-box;
-    background: #313244;
-    border: 1px solid #45475a;
-    border-radius: 6px;
-    color: #cdd6f4;
+    background: #2a2f3b;
+    border: 1px solid #444b5f;
+    border-radius: 8px;
+    color: #d6daf0;
     font-size: 13px;
-    padding: 6px 10px;
+    padding: 8px 10px 8px 32px;
     outline: none;
-    transition: border-color 0.15s ease;
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
 }
 
 .searchInput::placeholder {
@@ -83,6 +124,7 @@
 
 .searchInput:focus {
     border-color: #89b4fa;
+    background: #303749;
 }
 
 /* ── Document list ───────────────────────────────────────────────────────────── */
@@ -90,7 +132,7 @@
 .list {
     flex: 1;
     overflow-y: auto;
-    padding: 4px 6px 8px;
+    padding: 6px 8px 10px;
 }
 
 .list::-webkit-scrollbar {
@@ -123,24 +165,30 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    padding: 8px 10px;
-    margin-bottom: 2px;
+    padding: 9px 10px;
+    margin-bottom: 4px;
     text-align: left;
-    transition: background 0.12s ease;
+    border: 1px solid transparent;
+    transition:
+        background 0.12s ease,
+        border-color 0.12s ease;
 }
 
 .entry:hover {
-    background: #313244;
+    background: #303749;
+    border-color: #464f66;
 }
 
 .entryActive {
-    background: #45475a;
+    background: #36405a;
+    border-color: #5d7bb3;
+    box-shadow: inset 2px 0 0 #89b4fa;
 }
 
 .entryActive:hover {
-    background: #585b70;
+    background: #3b4560;
 }
 
 .entryTitle {
@@ -167,7 +215,7 @@
 
 .openFolderCta {
     margin-top: 12px;
-    padding: 6px 14px;
+    padding: 7px 14px;
     background: #89b4fa;
     color: #1e1e2e;
     border: none;
@@ -185,21 +233,26 @@
 /* ── Open-folder icon button (header) ────────────────────────────────────────── */
 
 .openFolderButton {
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
     cursor: pointer;
-    font-size: 15px;
+    color: #b7bdd5;
+    font-size: 14px;
     line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .openFolderButton:hover {
-    background: #313244;
+    background: #31394a;
+    border-color: #4a5164;
 }
 
 /* ── Tree row ─────────────────────────────────────────────────────────────────── */
@@ -211,26 +264,32 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    padding: 5px 8px;
+    padding: 7px 8px;
     text-align: left;
     font-size: 15px;
     color: #cdd6f4;
     gap: 8px;
-    transition: background 0.1s ease;
+    border: 1px solid transparent;
+    transition:
+        background 0.1s ease,
+        border-color 0.1s ease;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .treeRow:hover {
-    background: #313244;
+    background: #303749;
+    border-color: #464f66;
 }
 
 .treeRowActive {
-    background: #45475a;
-    color: #89b4fa;
+    background: #36405a;
+    color: #d5def8;
+    border-color: #5d7bb3;
+    box-shadow: inset 2px 0 0 #89b4fa;
 }
 
 .treeRowActive:hover {

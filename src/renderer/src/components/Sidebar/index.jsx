@@ -29,6 +29,7 @@ export default function Sidebar({
 
     const [query, setQuery] = useState('')
     const debouncedQuery = useDebounce(query, 150)
+    const docCountLabel = `${documents.length} ${documents.length === 1 ? 'item' : 'items'}`
 
     if (useFileTreeMode) {
         const { rootEntries, expandedPaths, loading, error, openFolder, toggleFolder } = treeState
@@ -37,7 +38,12 @@ export default function Sidebar({
         return (
             <div className={styles.sidebar}>
                 <div className={styles.header}>
-                    <span className={styles.headerTitle}>{folderName ?? 'Explorer'}</span>
+                    <div className={styles.headerMeta}>
+                        <span className={styles.headerTitle}>{folderName ?? 'Explorer'}</span>
+                        {treeState.rootFolderPath && (
+                            <span className={styles.headerSubtitle}>File browser</span>
+                        )}
+                    </div>
                     <div className={styles.headerActions}>
                         <button
                             className={styles.openFolderButton}
@@ -45,7 +51,7 @@ export default function Sidebar({
                             title="Open Folder"
                             aria-label="Open Folder"
                         >
-                            📂
+                            <span className="material-icons">create_new_folder</span>
                         </button>
                         <button
                             className={styles.toggleButton}
@@ -53,7 +59,7 @@ export default function Sidebar({
                             title="Toggle sidebar"
                             aria-label="Toggle sidebar"
                         >
-                            ‹
+                            <span className="material-icons">left_panel_close</span>
                         </button>
                     </div>
                 </div>
@@ -115,7 +121,10 @@ export default function Sidebar({
     return (
         <div className={styles.sidebar}>
             <div className={styles.header}>
-                <span className={styles.headerTitle}>Documents</span>
+                <div className={styles.headerMeta}>
+                    <span className={styles.headerTitle}>Documents</span>
+                    <span className={styles.headerSubtitle}>{docCountLabel}</span>
+                </div>
                 <div className={styles.headerActions}>
                     <button
                         className={styles.newDocButton}
@@ -123,7 +132,7 @@ export default function Sidebar({
                         title="New Document"
                         aria-label="New Document"
                     >
-                        +
+                        <span className="material-icons">add</span>
                     </button>
                     <button
                         className={styles.toggleButton}
@@ -131,20 +140,23 @@ export default function Sidebar({
                         title="Toggle sidebar"
                         aria-label="Toggle sidebar"
                     >
-                        ‹
+                        <span className="material-icons">left_panel_close</span>
                     </button>
                 </div>
             </div>
 
             <div className={styles.searchWrapper}>
-                <input
-                    className={styles.searchInput}
-                    type="text"
-                    placeholder="Search…"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    aria-label="Search documents"
-                />
+                <div className={styles.searchField}>
+                    <span className={`material-icons ${styles.searchIcon}`}>search</span>
+                    <input
+                        className={styles.searchInput}
+                        type="text"
+                        placeholder="Search documents…"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        aria-label="Search documents"
+                    />
+                </div>
             </div>
 
             <div className={styles.list}>

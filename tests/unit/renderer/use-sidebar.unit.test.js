@@ -36,7 +36,7 @@ describe('useSidebar', () => {
         const { result } = renderHook(() => useSidebar())
         await act(async () => {})
         expect(result.current.open).toBe(true)
-        expect(result.current.widthPercent).toBe(22)
+        expect(result.current.widthPercent).toBe(15)
     })
 
     test('state loaded from IPC on mount', async () => {
@@ -48,7 +48,7 @@ describe('useSidebar', () => {
     })
 
     test('toggle() calls setSidebarState({ open: false }) on first call', async () => {
-        api.ui.getSidebarState.mockResolvedValue({ open: true, widthPercent: 22 })
+        api.ui.getSidebarState.mockResolvedValue({ open: true, widthPercent: 15 })
         const { result } = renderHook(() => useSidebar())
         await act(async () => {})
 
@@ -61,7 +61,7 @@ describe('useSidebar', () => {
     })
 
     test('toggle() calls setSidebarState({ open: true }) on second call', async () => {
-        api.ui.getSidebarState.mockResolvedValue({ open: true, widthPercent: 22 })
+        api.ui.getSidebarState.mockResolvedValue({ open: true, widthPercent: 15 })
         const { result } = renderHook(() => useSidebar())
         await act(async () => {})
 

@@ -112,7 +112,12 @@ function CodeBlock({ className, children }) {
                             </button>
                         </div>
                         <div className={styles.snapshotPreview}>
-                            <SnapshotPane ref={snapshotRef} content={code} title={snapshotTitle} />
+                            <SnapshotPane
+                                ref={snapshotRef}
+                                content={code}
+                                title={snapshotTitle}
+                                lang={rawLanguage}
+                            />
                         </div>
                     </div>
                 </div>

@@ -109,17 +109,18 @@ export default function App() {
                         title="Open sidebar"
                         aria-label="Open sidebar"
                         style={{
-                            alignSelf: 'flex-start',
-                            margin: '8px 0 0 8px',
-                            background: 'transparent',
+                            alignSelf: 'stretch',
+                            width: '36px',
+                            background: 'linear-gradient(180deg, #1a2320 0%, #151d1b 100%)',
                             border: 'none',
+                            borderRight: '1px solid #2d4138',
                             cursor: 'pointer',
-                            fontSize: '18px',
-                            color: '#a6adc8',
+                            fontSize: '16px',
+                            color: '#c8ded5',
                             flexShrink: 0,
                         }}
                     >
-                        ›
+                        <span className="material-icons">chevron_right</span>
                     </button>
                     <div
                         style={{

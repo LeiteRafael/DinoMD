@@ -120,11 +120,6 @@
     padding: 0.2rem 0.55rem;
     font-size: 0.72rem;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-}
-
-.codeBlockOuter:hover .snapshotToggleBtn {
     opacity: 1;
 }
 

@@ -14,72 +14,8 @@
 - **Reader view** — clean, styled Markdown rendering with syntax highlighting (Shiki) and GFM support
 - **Editor view** — in-app Markdown editor with live debounce saving
 - **Split view** — side-by-side editor and preview with synchronized scrolling
-- **File tree sidebar** — browse and open any folder from disk; detects external file changes
-- **Persistent state** — document list and sidebar state are saved between sessions via `electron-store`
-- **Web mode** — runs as a plain browser app (without Electron) for development and testing
-
----
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│                Electron Main                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │documents │  │  folder  │  │    ui    │   │  ← IPC handlers
-│  └──────────┘  └──────────┘  └──────────┘   │
-│  ┌──────────────────────────────────────┐   │
-│  │  electron-store  │  fs/fileUtils     │   │
-│  └──────────────────────────────────────┘   │
-└────────────────────┬────────────────────────┘
-                     │ contextBridge (window.api)
-┌────────────────────▼────────────────────────┐
-│              React Renderer                 │
-│  Pages: MainPage · ReaderPage               │
-│          EditorPage · SplitViewPage         │
-│  Components: Sidebar · MarkdownViewer       │
-│              MarkdownEditor · Toast …       │
-│  Hooks: useDocuments · useEditor            │
-│         useSidebar · useFileTree            │
-│         useSyncScroll · useToast …          │
-└─────────────────────────────────────────────┘
-```
-
-**IPC channels exposed via preload:**
-
-| Namespace | Channels |
-|---|---|
-| `documents` | `import-files`, `get-all`, `reorder`, `read-content`, `remove`, `create`, `save`, `rename`, `delete` |
-| `folder` | `open-picker`, `read-dir`, `read-file`, `write-file` |
-| `ui` | `get-sidebar-state`, `set-sidebar-state` |
-| event | `file:changed-externally` |
-
----
-
-## Project structure
-
-```
-src/
-├── main/               # Electron main process
-│   ├── index.js        # App entry point, BrowserWindow setup
-│   ├── ipc/            # IPC handler registration (documents, folder, ui)
-│   ├── fs/             # File system utilities
-│   └── store/          # electron-store persistence layer
-├── preload/
-│   └── index.js        # contextBridge API exposed to renderer
-├── renderer/           # React app (Electron target)
-│   └── src/
-│       ├── App.jsx
-│       ├── pages/      # MainPage, ReaderPage, EditorPage, SplitViewPage
-│       ├── components/ # Sidebar, MarkdownViewer, MarkdownEditor, Toast …
-│       ├── hooks/      # useDocuments, useEditor, useSidebar, useFileTree …
-│       ├── services/   # api.js — wraps window.api with browser fallbacks
-│       └── utils/      # clipboardUtils, markdownTokenizer
-└── web/                # Browser-only entry point (no Electron)
-    ├── index.html
-    ├── main.jsx
-    └── browserApi.js   # Mock of window.api for browser mode
-```
+- **File tree sidebar** — browse and open any folder from disk via the File System Access API
+- **Persistent state** — document list and sidebar state are saved between sessions via `localStorage`
 
 ---
 
@@ -137,6 +73,26 @@ docker compose -f docker/docker-compose.yml up --build
 ```
 
 The container mounts `src/` and `tests/` as volumes, so local changes are picked up without rebuilding the image.
+
+---
+
+## Project structure
+
+```
+src/
+├── renderer/           # React app
+│   └── src/
+│       ├── App.jsx
+│       ├── pages/      # MainPage, ReaderPage, EditorPage, SplitViewPage
+│       ├── components/ # Sidebar, MarkdownViewer, MarkdownEditor, Toast …
+│       ├── hooks/      # useDocuments, useEditor, useSidebar, useFileTree …
+│       ├── services/   # api.js — wraps window.api
+│       └── utils/      # clipboardUtils, markdownTokenizer
+└── web/                # Browser entry point
+    ├── index.html
+    ├── main.jsx
+    └── browserApi.js   # window.api implementation for browser
+```
 
 ---
 

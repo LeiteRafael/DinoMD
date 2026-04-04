@@ -66,7 +66,7 @@ describe('Sidebar document list + document selection integration', () => {
 
     test('filters document list according to search query', () => {
         render(<Sidebar documents={docs} onOpenDocument={vi.fn()} />)
-        const searchInput = screen.getByPlaceholderText('Search…')
+        const searchInput = screen.getByPlaceholderText('Search documents…')
 
         fireEvent.change(searchInput, { target: { value: 'Gamma' } })
 

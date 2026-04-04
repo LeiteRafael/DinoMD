@@ -123,7 +123,7 @@ export default function App() {
                             paddingTop: '12px',
                         }}
                     >
-                        <span className="material-icons">right_panel_open</span>
+                        <span className="material-icons">chevron_right</span>
                     </button>
                     <div
                         style={{

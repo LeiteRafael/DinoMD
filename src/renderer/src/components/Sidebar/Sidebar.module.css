@@ -72,7 +72,7 @@
     line-height: 1;
     width: 28px;
     height: 28px;
-    border-radius: 8px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +182,7 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
     padding: 9px 10px;
     margin-bottom: 4px;
@@ -236,7 +236,7 @@
     background: var(--sidebar-focus);
     color: #122019;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -258,7 +258,7 @@
     line-height: 1;
     width: 28px;
     height: 28px;
-    border-radius: 8px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -281,7 +281,7 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
     padding: 7px 8px;
     text-align: left;

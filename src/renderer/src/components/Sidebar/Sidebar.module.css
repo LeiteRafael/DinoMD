@@ -55,7 +55,7 @@
     line-height: 1;
     width: 28px;
     height: 28px;
-    border-radius: 8px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -108,7 +108,7 @@
     box-sizing: border-box;
     background: #2a2f3b;
     border: 1px solid #444b5f;
-    border-radius: 8px;
+    border-radius: 0;
     color: #d6daf0;
     font-size: 13px;
     padding: 8px 10px 8px 32px;
@@ -141,7 +141,7 @@
 
 .list::-webkit-scrollbar-thumb {
     background: #45475a;
-    border-radius: 2px;
+    border-radius: 0;
 }
 
 /* ── Empty / no-results states ───────────────────────────────────────────────── */
@@ -165,7 +165,7 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
     padding: 9px 10px;
     margin-bottom: 4px;
@@ -219,7 +219,7 @@
     background: #89b4fa;
     color: #1e1e2e;
     border: none;
-    border-radius: 6px;
+    border-radius: 0;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -241,7 +241,7 @@
     line-height: 1;
     width: 28px;
     height: 28px;
-    border-radius: 8px;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -264,7 +264,7 @@
     box-sizing: border-box;
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     cursor: pointer;
     padding: 7px 8px;
     text-align: left;

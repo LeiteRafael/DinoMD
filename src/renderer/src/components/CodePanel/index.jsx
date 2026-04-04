@@ -23,6 +23,7 @@ const CodePanel = ({
     const snapshotFrameRef = useRef(null)
     const { exportPng, exporting, error } = useSnapshotExport(snapshotFrameRef, documentName ?? '')
     const snapshotTitle = documentName || languageFromExtension(filePath ?? '') || ''
+    const snapshotLang = filePath ? filePath.split('.').pop().toLowerCase() : ''
 
     return (
         <div className={styles.panel}>
@@ -34,7 +35,12 @@ const CodePanel = ({
                 error={error}
             />
             {mode === 'snapshot' ? (
-                <SnapshotPane ref={snapshotFrameRef} content={value} title={snapshotTitle} />
+                <SnapshotPane
+                    ref={snapshotFrameRef}
+                    content={value}
+                    title={snapshotTitle}
+                    lang={snapshotLang}
+                />
             ) : (
                 <EditorPane
                     value={value}

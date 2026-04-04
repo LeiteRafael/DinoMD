@@ -111,19 +111,19 @@ export default function App() {
                         style={{
                             alignSelf: 'stretch',
                             width: '36px',
-                            background: 'linear-gradient(180deg, #1c1f26 0%, #181b22 100%)',
+                            background: 'linear-gradient(180deg, #1a2320 0%, #151d1b 100%)',
                             border: 'none',
-                            borderRight: '1px solid #2e3440',
+                            borderRight: '1px solid #2d4138',
                             cursor: 'pointer',
                             fontSize: '16px',
-                            color: '#b7bdd5',
+                            color: '#c8ded5',
                             flexShrink: 0,
                             display: 'flex',
                             justifyContent: 'center',
                             paddingTop: '12px',
                         }}
                     >
-                        <span className="material-icons">right_panel_open</span>
+                        <span className="material-icons">chevron_right</span>
                     </button>
                     <div
                         style={{

@@ -3,7 +3,7 @@ import useDebounce from './useDebounce.js'
 import { api } from '../services/api.js'
 const DEFAULTS = {
     open: true,
-    widthPercent: 22,
+    widthPercent: 15,
     rootFolderPath: null,
 }
 export default function useSidebar() {

@@ -59,7 +59,7 @@ export default function Sidebar({
                             title="Toggle sidebar"
                             aria-label="Toggle sidebar"
                         >
-                            <span className="material-icons">left_panel_close</span>
+                            <span className="material-icons">chevron_left</span>
                         </button>
                     </div>
                 </div>
@@ -140,7 +140,7 @@ export default function Sidebar({
                         title="Toggle sidebar"
                         aria-label="Toggle sidebar"
                     >
-                        <span className="material-icons">left_panel_close</span>
+                        <span className="material-icons">chevron_left</span>
                     </button>
                 </div>
             </div>

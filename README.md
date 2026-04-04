@@ -20,45 +20,6 @@ Built with <b>React 18</b> and <b>Vite</b>. </p> <p align="center"> <img src="ht
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│              React Renderer                 │
-│  Pages: MainPage · ReaderPage               │
-│          EditorPage · SplitViewPage         │
-│  Components: Sidebar · MarkdownViewer       │
-│              MarkdownEditor · Toast …       │
-│  Hooks: useDocuments · useEditor            │
-│         useSidebar · useFileTree            │
-│         useSyncScroll · useToast …          │
-└─────────────────────────────────────────────┘
-```
-
-The browser `window.api` surface is provided by `src/web/browserApi.js`, which uses `localStorage` for document persistence and the **File System Access API** for folder browsing.
-
----
-
-## Project structure
-
-```
-src/
-├── renderer/           # React app
-│   └── src/
-│       ├── App.jsx
-│       ├── pages/      # MainPage, ReaderPage, EditorPage, SplitViewPage
-│       ├── components/ # Sidebar, MarkdownViewer, MarkdownEditor, Toast …
-│       ├── hooks/      # useDocuments, useEditor, useSidebar, useFileTree …
-│       ├── services/   # api.js — wraps window.api
-│       └── utils/      # clipboardUtils, markdownTokenizer
-└── web/                # Browser entry point
-    ├── index.html
-    ├── main.jsx
-    └── browserApi.js   # window.api implementation for browser
-```
-
----
-
 ## Getting started
 
 ### Prerequisites
@@ -104,6 +65,26 @@ docker compose -f docker/docker-compose.yml up --build
 ```
 
 The container mounts `src/` and `tests/` as volumes, so local changes are picked up without rebuilding the image.
+
+---
+
+## Project structure
+
+```
+src/
+├── renderer/           # React app
+│   └── src/
+│       ├── App.jsx
+│       ├── pages/      # MainPage, ReaderPage, EditorPage, SplitViewPage
+│       ├── components/ # Sidebar, MarkdownViewer, MarkdownEditor, Toast …
+│       ├── hooks/      # useDocuments, useEditor, useSidebar, useFileTree …
+│       ├── services/   # api.js — wraps window.api
+│       └── utils/      # clipboardUtils, markdownTokenizer
+└── web/                # Browser entry point
+    ├── index.html
+    ├── main.jsx
+    └── browserApi.js   # window.api implementation for browser
+```
 
 ---
 

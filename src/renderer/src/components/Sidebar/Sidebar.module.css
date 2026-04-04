@@ -1,9 +1,26 @@
 .sidebar {
+    --sidebar-bg-top: #1a2320;
+    --sidebar-bg-bottom: #151d1b;
+    --sidebar-border: #2d4138;
+    --sidebar-muted: #8ca39a;
+    --sidebar-text: #c8ded5;
+    --sidebar-text-strong: #e3f1eb;
+    --sidebar-hover: #263730;
+    --sidebar-hover-border: #385346;
+    --sidebar-active: #30453c;
+    --sidebar-active-border: #4e7362;
+    --sidebar-focus: #7ecf95;
+    --sidebar-input: #24322d;
+    --sidebar-input-border: #3b554a;
+    --sidebar-input-focus: #2b3e36;
+    --sidebar-scrollbar: #3f5d51;
+    --sidebar-danger: #f38ba8;
+
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: linear-gradient(180deg, #1c1f26 0%, #181b22 100%);
-    border-right: 1px solid #2e3440;
+    background: linear-gradient(180deg, var(--sidebar-bg-top) 0%, var(--sidebar-bg-bottom) 100%);
+    border-right: 1px solid var(--sidebar-border);
     overflow: hidden;
 }
 
@@ -15,7 +32,7 @@
     justify-content: space-between;
     padding: 12px 12px 10px;
     flex-shrink: 0;
-    border-bottom: 1px solid #2e3440;
+    border-bottom: 1px solid var(--sidebar-border);
 }
 
 .headerMeta {
@@ -29,13 +46,13 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #b7bdd5;
+    color: var(--sidebar-text);
     user-select: none;
 }
 
 .headerSubtitle {
     font-size: 11px;
-    color: #7d849f;
+    color: var(--sidebar-muted);
     user-select: none;
 }
 
@@ -50,7 +67,7 @@
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid transparent;
     cursor: pointer;
-    color: #b7bdd5;
+    color: var(--sidebar-text);
     font-size: 16px;
     line-height: 1;
     width: 28px;
@@ -67,9 +84,9 @@
 
 .newDocButton:hover,
 .toggleButton:hover {
-    background: #31394a;
-    color: #e6e9f6;
-    border-color: #4a5164;
+    background: var(--sidebar-hover);
+    color: var(--sidebar-text-strong);
+    border-color: var(--sidebar-hover-border);
 }
 
 .newDocButton:focus-visible,
@@ -79,7 +96,7 @@
 .entry:focus-visible,
 .treeRow:focus-visible,
 .openFolderCta:focus-visible {
-    outline: 2px solid #89b4fa;
+    outline: 2px solid var(--sidebar-focus);
     outline-offset: 1px;
 }
 
@@ -100,16 +117,16 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
-    color: #79819c;
+    color: var(--sidebar-muted);
 }
 
 .searchInput {
     width: 100%;
     box-sizing: border-box;
-    background: #2a2f3b;
-    border: 1px solid #444b5f;
+    background: var(--sidebar-input);
+    border: 1px solid var(--sidebar-input-border);
     border-radius: 8px;
-    color: #d6daf0;
+    color: var(--sidebar-text);
     font-size: 13px;
     padding: 8px 10px 8px 32px;
     outline: none;
@@ -119,12 +136,12 @@
 }
 
 .searchInput::placeholder {
-    color: #6c7086;
+    color: #758e84;
 }
 
 .searchInput:focus {
-    border-color: #89b4fa;
-    background: #303749;
+    border-color: var(--sidebar-focus);
+    background: var(--sidebar-input-focus);
 }
 
 /* ── Document list ───────────────────────────────────────────────────────────── */
@@ -140,7 +157,7 @@
 }
 
 .list::-webkit-scrollbar-thumb {
-    background: #45475a;
+    background: var(--sidebar-scrollbar);
     border-radius: 2px;
 }
 
@@ -151,7 +168,7 @@
     padding: 24px 12px;
     text-align: center;
     font-size: 13px;
-    color: #6c7086;
+    color: #758e84;
     user-select: none;
 }
 
@@ -177,24 +194,24 @@
 }
 
 .entry:hover {
-    background: #303749;
-    border-color: #464f66;
+    background: var(--sidebar-hover);
+    border-color: var(--sidebar-hover-border);
 }
 
 .entryActive {
-    background: #36405a;
-    border-color: #5d7bb3;
-    box-shadow: inset 2px 0 0 #89b4fa;
+    background: var(--sidebar-active);
+    border-color: var(--sidebar-active-border);
+    box-shadow: inset 2px 0 0 var(--sidebar-focus);
 }
 
 .entryActive:hover {
-    background: #3b4560;
+    background: #365146;
 }
 
 .entryTitle {
     font-size: 13px;
     font-weight: 500;
-    color: #cdd6f4;
+    color: var(--sidebar-text);
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
@@ -203,7 +220,7 @@
 
 .entryPreview {
     font-size: 11px;
-    color: #a6adc8;
+    color: #9eb5ad;
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
@@ -216,8 +233,8 @@
 .openFolderCta {
     margin-top: 12px;
     padding: 7px 14px;
-    background: #89b4fa;
-    color: #1e1e2e;
+    background: var(--sidebar-focus);
+    color: #122019;
     border: none;
     border-radius: 6px;
     font-size: 13px;
@@ -227,7 +244,7 @@
 }
 
 .openFolderCta:hover {
-    background: #b4d0fa;
+    background: #a5ddb5;
 }
 
 /* ── Open-folder icon button (header) ────────────────────────────────────────── */
@@ -236,7 +253,7 @@
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid transparent;
     cursor: pointer;
-    color: #b7bdd5;
+    color: var(--sidebar-text);
     font-size: 14px;
     line-height: 1;
     width: 28px;
@@ -251,8 +268,8 @@
 }
 
 .openFolderButton:hover {
-    background: #31394a;
-    border-color: #4a5164;
+    background: var(--sidebar-hover);
+    border-color: var(--sidebar-hover-border);
 }
 
 /* ── Tree row ─────────────────────────────────────────────────────────────────── */
@@ -269,7 +286,7 @@
     padding: 7px 8px;
     text-align: left;
     font-size: 15px;
-    color: #cdd6f4;
+    color: var(--sidebar-text);
     gap: 8px;
     border: 1px solid transparent;
     transition:
@@ -281,19 +298,19 @@
 }
 
 .treeRow:hover {
-    background: #303749;
-    border-color: #464f66;
+    background: var(--sidebar-hover);
+    border-color: var(--sidebar-hover-border);
 }
 
 .treeRowActive {
-    background: #36405a;
-    color: #d5def8;
-    border-color: #5d7bb3;
-    box-shadow: inset 2px 0 0 #89b4fa;
+    background: var(--sidebar-active);
+    color: var(--sidebar-text-strong);
+    border-color: var(--sidebar-active-border);
+    box-shadow: inset 2px 0 0 var(--sidebar-focus);
 }
 
 .treeRowActive:hover {
-    background: #585b70;
+    background: #365146;
 }
 
 .treeRowUnsupported {
@@ -324,7 +341,7 @@
 
 .unsupportedNotice {
     font-size: 11px;
-    color: #f38ba8;
+    color: var(--sidebar-danger);
     padding: 2px 8px 4px;
     margin-left: 8px;
     user-select: none;
